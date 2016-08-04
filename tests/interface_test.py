@@ -4,7 +4,6 @@ import unittest
 
 import responses
 from future.moves.urllib.parse import parse_qs
-from builtins import bytes
 
 import gogs_client
 import gogs_client.http_utils as http_utils
