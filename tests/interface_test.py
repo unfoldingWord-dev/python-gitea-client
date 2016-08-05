@@ -156,8 +156,12 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.GET, uri2, status=404)
         user = self.client.get_user(None, "username1")
         self.assert_users_equals(user, self.expected_user)
-        self.assertRaises(gogs_client.GogsApi.ApiFailure, self.client.get_user,
-                          None, "username2")
+        try:
+            self.client.get_user(None, "username2")
+            raise AssertionError("Call to get_user did not raise an exception")
+        except gogs_client.GogsApi.ApiFailure as exc:
+            self.assertIsNotNone(exc.message)
+            self.assertEqual(exc.status_code, 404)
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
         self.assertEqual(first_call.request.url, uri1)
@@ -170,6 +174,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
             .set_full_name("Example User")\
             .set_password("Password")\
             .set_website("mywebsite.net")\
+            .set_active(True)\
+            .set_admin(False)\
+            .set_allow_git_hook(False)\
             .build()
 
         def callback(request):
@@ -179,6 +186,12 @@ class GogsClientInterfaceTest(unittest.TestCase):
             self.assertEqual(data["email"], "user@example.com")
             self.assertEqual(data["password"], "Password")
             self.assertEqual(data["website"], "mywebsite.net")
+            self.assertRegexpMatches(str(data["active"]), r"[tT]rue")
+            self.assertRegexpMatches(str(data["admin"]), r"[fF]alse")
+            self.assertRegexpMatches(str(data["allow_git_hook"]), r"[fF]alse")
+            self.assertNotIn("source_id", data)
+            self.assertNotIn("location", data)
+            self.assertNotIn("allow_import_local", data)
             return 200, {}, self.user_json_str
         uri = self.path("/admin/users/username")
         responses.add_callback(responses.PATCH, uri, callback=callback)

@@ -81,9 +81,11 @@ class GogsUserUpdate(object):
 
         def set_allow_git_hook(self, allow_git_hook):
             self._allow_git_hook = allow_git_hook
+            return self
 
         def set_allow_import_local(self, allow_import_local):
             self._allow_import_local = allow_import_local
+            return self
 
         def build(self):
             return GogsUserUpdate(
