@@ -1,0 +1,18 @@
+language: python
+python:
+- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+install:
+- pip install -r requirements.txt
+- pip install -r test_requirements.txt
+script: nosetests
+deploy:
+  provider: pypi
+  user: ethantkoenig
+  password:
+    secure: sqBYW61yvGApUb79YUQ0AJ028olyJt1jGUOaHeZo9POopxgjhUzNNcoDn7JacqtcihGpcMHkpILHWFTMmGxYUQpnPdtB8crTxGoU0aNAQ5hsV5eg/Eay8eWlaKTmoIFvDcKJPbowZFx1wI1WrHrxlfaBtpU3aPl0dV3i2LgZP05dWBEjDuQ6NMx2QlRJkwwmVwLTvnxUcloKEqcNOs09xQjfOZjkZTk9xlkCzoQnaiUBXxYhA8YMxYVVPT7Nrrvlt0b/Qb1pL7FM21qleIwKT5rCiDvu+Dy0rqw5B+HtkVVsnwlkrUyqq1Y/WnrNMyBNCnlwfC6ytirsI/Q2DFNDrQ+z/+CE3HqcZEJw0QYSovYlpSOFHyr0iqnApl3ubQT9U5JLwuFNcr8wkgc1m13S85qTFEtpAPPZDsXrbBGQTsCmZvqFSsHtTp/dRdlxPR/2YbE/AzDYDdazlnR//UYZen/towXK7FEISKeS8Gzq3p1H7MQnuu4GXM8zHoGXHZPV65Zafx8RebCWN3ogliYdA3GxmmScAhJdd0q+K0A+KCicZJbwJh09dUqXfu6z95bO85rCaW2B6PWYo3adGlNxMfr+t7FnbNdMECstHZX08hnZPIqC3QCSEc4L2AiWeQsLzpYuUYQ9oS2fsObbGn4RpQpVyJ/K9ze5uDO6XvI7FPQ=
+  on:
+    tags: true
