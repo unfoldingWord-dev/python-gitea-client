@@ -7,7 +7,11 @@ python:
 install:
 - pip install -r requirements.txt
 - pip install -r test_requirements.txt
-script: nosetests
+- pip install coveralls
+script:
+  coverage run --source=gogs_client setup.py test
+after_success:
+  coveralls
 deploy:
   provider: pypi
   user: ethantkoenig
