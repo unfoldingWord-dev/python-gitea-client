@@ -3,27 +3,39 @@ Various classes for Gogs authentication
 """
 
 
-class GogsAuthentication(object):
+class Authentication(object):
     """
-    An "abstract" parent class for GogsAuthentication objects. Represents a
+    An "abstract" parent class. Represents a
     means of authenticating oneself to Gogs
     """
     def update_kwargs(self, kwargs):
         """
         Updates kwargs to include this object's authentication information
-        :param kwargs: dictionary of keyword arguments to pass to a function from
+        :param dict kwargs: dictionary of keyword arguments to pass to a function from
             the requests module
         :return: Updated kwargs
         """
         raise NotImplementedError()  # must be implemented by subclasses
 
 
-class GogsToken(GogsAuthentication):
+class Token(Authentication):
+    """
+    An immutable represention of a Gogs authentication token
+    """
     def __init__(self, token):
+        """
+        :param str token: contents of Gogs authentication token
+        """
         self._token = token
 
     @property
-    def token(self): return self._token
+    def token(self):
+        """
+        The contents of the Gogs authenticatino token
+
+        :rtype: str
+        """
+        return self._token
 
     def update_kwargs(self, kwargs):
         if "params" in kwargs:
@@ -32,16 +44,35 @@ class GogsToken(GogsAuthentication):
             kwargs["params"] = {"token": self._token}
 
 
-class GogsUsernamePassword(GogsAuthentication):
+class UsernamePassword(Authentication):
+    """
+    An immutable representation of a Gogs username/password combination
+    """
+
     def __init__(self, username, password):
+        """
+        :param str username: Username for Gogs account
+        :param str password: Password for Gogs account
+        """
         self._username = username
         self._password = password
 
     @property
-    def username(self): return self._username
+    def username(self):
+        """
+        Username for Gogs account
+
+        :rtype: str
+        """
+        return self._username
 
     @property
-    def password(self): return self._password
+    def password(self):
+        """
+        Password for Gogs account
+        :rtype: str
+        """
+        return self._password
 
     def update_kwargs(self, kwargs):
         kwargs["auth"] = (self._username, self._password)

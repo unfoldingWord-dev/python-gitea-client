@@ -16,8 +16,9 @@ class RelativeHttpRequestor(object):
 
     def absolute_url(self, relative_path):
         """
-        :param relative_path: relative URL
+        :param str relative_path: relative URL
         :return: absolute URL of relative_path, relative to this object's base URL
+        :rtype: str
         """
         return append_url(self.base_url, relative_path)
 

@@ -6,7 +6,7 @@ import responses
 from future.moves.urllib.parse import parse_qs
 
 import gogs_client
-import gogs_client.http_utils as http_utils
+import gogs_client._implementation.http_utils as http_utils
 
 
 class GogsClientInterfaceTest(unittest.TestCase):
@@ -43,8 +43,8 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "email": "u@gogs.io",
                   "avatar_url": "/avatars/1"
                 }"""
-        self.token = gogs_client.GogsToken("mytoken")
-        self.username_password = gogs_client.GogsUsernamePassword(
+        self.token = gogs_client.Token("mytoken")
+        self.username_password = gogs_client.UsernamePassword(
             "auth_username", "password")
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
@@ -81,7 +81,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.GET, uri2, status=404)
         repo = self.client.get_repo(self.token, "username", "repo1")
         self.assert_repos_equal(repo, self.expected_repo)
-        self.assertRaises(gogs_client.GogsApi.ApiFailure, self.client.get_repo,
+        self.assertRaises(gogs_client.ApiFailure, self.client.get_repo,
                           self.token, "username", "repo2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
@@ -96,7 +96,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.DELETE, uri1, status=204)
         responses.add(responses.DELETE, uri2, status=401)
         self.client.delete_repo(self.token, "username", "repo1")
-        self.assertRaises(gogs_client.GogsApi.ApiFailure, self.client.delete_repo,
+        self.assertRaises(gogs_client.ApiFailure, self.client.delete_repo,
                           self.token, "otherusername", "repo2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
@@ -159,7 +159,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         try:
             self.client.get_user(None, "username2")
             raise AssertionError("Call to get_user did not raise an exception")
-        except gogs_client.GogsApi.ApiFailure as exc:
+        except gogs_client.ApiFailure as exc:
             self.assertIsNotNone(exc.message)
             self.assertEqual(exc.status_code, 404)
         self.assertEqual(len(responses.calls), 2)
@@ -205,7 +205,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.DELETE, uri1, status=204)
         responses.add(responses.DELETE, uri2, status=401)
         self.client.delete_user(self.username_password, "username1")
-        self.assertRaises(gogs_client.GogsApi.ApiFailure, self.client.delete_user,
+        self.assertRaises(gogs_client.ApiFailure, self.client.delete_user,
                           self.username_password, "username2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]

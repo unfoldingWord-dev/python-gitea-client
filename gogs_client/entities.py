@@ -14,6 +14,9 @@ def json_get(parsed_json, key):
 
 
 class GogsUser(object):
+    """
+     An immutable representation of a Gogs user.
+    """
     def __init__(self, user_id, username, full_name, email, avatar_url):
         self._id = user_id
         self._username = username
@@ -32,22 +35,56 @@ class GogsUser(object):
                         email=email, avatar_url=avatar_url)
 
     @property  # named user_id to avoid conflict with built-in id
-    def user_id(self): return self._id
+    def user_id(self):
+        """
+        The user's id
+
+        :rtype: int
+        """
+        return self._id
 
     @property
-    def username(self): return self._username
+    def username(self):
+        """
+        The user's username
+
+        :rtype: str
+        """
+        return self._username
 
     @property
-    def full_name(self): return self._full_name
+    def full_name(self):
+        """
+        The user's full name
+
+        :rtype: str
+        """
+        return self._full_name
 
     @property
-    def email(self): return self._email
+    def email(self):
+        """
+        The user's email address. Can be empty as a result of invalid authentication
+
+        :rtype: str
+        """
+        return self._email
 
     @property
-    def avatar_url(self): return self._avatar_url
+    def avatar_url(self):
+        """
+        The user's avatar URL
+
+        :rtype: str
+        """
+        return self._avatar_url
 
 
 class GogsRepo(object):
+    """
+    An immutable representation of a Gogs repository
+    """
+
     def __init__(self, repo_id, owner, full_name, private, fork, urls, permissions):
         self._repo_id = repo_id
         self._owner = owner
@@ -71,25 +108,67 @@ class GogsRepo(object):
                         urls=urls, permissions=permissions)
 
     @property  # named repo_id to avoid conflict with built-in id
-    def repo_id(self): return self._repo_id
+    def repo_id(self):
+        """
+        The repository's id number
+
+        :rtype: int
+        """
+        return self._repo_id
 
     @property
-    def owner(self): return self._owner
+    def owner(self):
+        """
+        The owner of the repository
+
+        :rtype: entities.GogsUser
+        """
+        return self._owner
 
     @property
-    def full_name(self): return self._full_name
+    def full_name(self):
+        """
+        The full name of the repository
+
+        :rtype: str
+        """
+        return self._full_name
 
     @property
-    def private(self): return self._private
+    def private(self):
+        """
+        Whether the repository is private
+
+        :rtype: bool
+        """
+        return self._private
 
     @property
-    def fork(self): return self._fork
+    def fork(self):
+        """
+        Whether the repository is a fork
+
+        :rtype: bool
+        """
+        return self._fork
 
     @property
-    def urls(self): return self._urls
+    def urls(self):
+        """
+        URLs of the repository
+
+        :rtype: GogsRepo.Urls
+        """
+        return self._urls
 
     @property
-    def permissions(self): return self._permissions
+    def permissions(self):
+        """
+        Permissions for the repository
+
+        :rtype: GogsRepo.Permissions
+        """
+        return self._permissions
 
     class Urls(object):
         def __init__(self, html_url, clone_url, ssh_url):
@@ -98,13 +177,29 @@ class GogsRepo(object):
             self._ssh_url = ssh_url
 
         @property
-        def html_url(self): return self._html_url
+        def html_url(self):
+            """
+            URL for the repository's webpage
+            :rtype: str
+            """
+            return self._html_url
 
         @property
-        def clone_url(self): return self._clone_url
+        def clone_url(self):
+            """
+            URL for cloning the repository (via HTTP)
+
+            :rtype: str
+            """
+            return self._clone_url
 
         @property
-        def ssh_url(self): return self._ssh_url
+        def ssh_url(self):
+            """
+            URL for cloning the repository via SSH
+            :rtype:
+            """
+            return self._ssh_url
 
     class Permissions(object):
         def __init__(self, admin, push, pull):
@@ -120,10 +215,28 @@ class GogsRepo(object):
             return GogsRepo.Permissions(admin, push, pull)
 
         @property
-        def admin(self): return self._admin
+        def admin(self):
+            """
+            Whether the user that requested this repository has admin permissions
+
+            :rtype: bool
+            """
+            return self._admin
 
         @property
-        def push(self): return self._push
+        def push(self):
+            """
+            Whether the user that requested this repository has push permissions
+
+            :rtype: bool
+            """
+            return self._push
 
         @property
-        def pull(self): return self._pull
+        def pull(self):
+            """
+            Whether the user that requested this repository has pull permissions
+
+            :rtype: bool
+            """
+            return self._pull

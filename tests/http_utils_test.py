@@ -1,6 +1,6 @@
 import unittest
 
-import gogs_client.http_utils as http_utils
+import gogs_client._implementation.http_utils as http_utils
 
 
 class HttpUtilsTest(unittest.TestCase):
