@@ -19,12 +19,28 @@ class GogsApi(object):
 
     def valid_authentication(self, auth):
         """
+        Returns whether the provided authentication is valid
+
         :param auth.Authentication auth: authentication object
         :return: whether the provided authentication is valid
         :rtype: bool
         :raises NetworkFailure: if there is an error communicating with the server
         """
-        return self._get("/user/repos", auth=auth).ok
+        return self._get("/user", auth=auth).ok
+
+    def authenticated_user(self, auth):
+        """
+        Returns the user authenticated by the given authentication
+
+        :param auth.Authentication auth: authentication for user to retrieve
+
+        :return: user corresponding to the provided authentication
+        :rtype: GogsUser
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        response = self._get("/user", auth=auth)
+        return GogsUser.from_json(self._check_ok(response).json())
 
     def create_repo(self, auth, name, description=None, private=False, auto_init=False,
                     gitignore_templates=None, license_template=None, readme_template=None):

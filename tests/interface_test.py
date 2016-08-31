@@ -215,6 +215,29 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(last_call.request.url, uri2)
         self.check_for_basic_auth(last_call.request)
 
+    @responses.activate
+    def test_valid_authentication1(self):
+        uri = self.path("/user")
+        valid_token = gogs_client.Token("a_valid_token")
+        invalid_token = gogs_client.Token("an_invalid_token")
+        def callback(request):
+            if request.url == self.path_with_token(uri, valid_token):
+                return 200, {}, self.user_json_str
+            elif request.url == self.path_with_token(uri, invalid_token):
+                return 401, {}, ""
+            else:
+                self.fail("Unexpected URL: {}".format(request.url))
+        responses.add_callback(responses.GET, uri, callback=callback)
+        self.assertTrue(self.client.valid_authentication(valid_token))
+        self.assertFalse(self.client.valid_authentication(invalid_token))
+
+    @responses.activate
+    def test_authenticated_user(self):
+        uri = self.path("/user")
+        responses.add(responses.GET, uri, body=self.user_json_str, status=200)
+        user = self.client.authenticated_user(self.token)
+        self.assert_users_equals(user, self.expected_user)
+
     # helper methods
 
     @staticmethod
@@ -224,8 +247,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
     def path(self, relative):
         return http_utils.append_url(self.api_endpoint, relative)
 
-    def path_with_token(self, path):
-        return "{p}?token={t}".format(p=path, t=self.token.token)
+    def path_with_token(self, path, token=None):
+        token = self.token if token is None else token
+        return "{p}?token={t}".format(p=path, t=token.token)
 
     def check_for_basic_auth(self, request):
         auth = "{u}:{p}".format(u=self.username_password.username,
