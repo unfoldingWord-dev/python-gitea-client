@@ -21,3 +21,5 @@ uses this package in it's ``tx-manager`` component as the ``tx-auth`` module.
 The easiest way to install is via ``pip``::
 
     $ pip install gogs_client
+
+Documentation for the module can be found `here <http://pythonhosted.org/gogs-client/>`_.
