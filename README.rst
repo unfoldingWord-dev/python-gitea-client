@@ -1,14 +1,19 @@
 Master:
-
-.. image:: https://travis-ci.org/unfoldingWord-dev/python-gogs-client.svg?branch=master
+  .. image:: https://travis-ci.org/unfoldingWord-dev/python-gogs-client.svg?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/unfoldingWord-dev/python-gogs-client
+  .. image:: https://coveralls.io/repos/github/unfoldingWord-dev/python-gogs-client/badge.svg?branch=master
+    :alt: Coverage
+    :target: https://coveralls.io/github/unfoldingWord-dev/python-gogs-client?branch=master
 
 Develop:
-
-.. image:: https://travis-ci.org/unfoldingWord-dev/python-gogs-client.svg?branch=develop
+  .. image:: https://travis-ci.org/unfoldingWord-dev/python-gogs-client.svg?branch=develop
     :alt: Build Status
     :target: https://travis-ci.org/unfoldingWord-dev/python-gogs-client
+  .. image:: https://coveralls.io/repos/github/unfoldingWord-dev/python-gogs-client/badge.svg?branch=develop
+    :alt: Coverage
+    :target: https://coveralls.io/github/unfoldingWord-dev/python-gogs-client?branch=develop
+
 
 python-gogs-client
 ==================
