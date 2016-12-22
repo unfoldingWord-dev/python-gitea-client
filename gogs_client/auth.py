@@ -20,7 +20,7 @@ class Authentication(object):
 
 class Token(Authentication):
     """
-    An immutable represention of a Gogs authentication token
+    An immutable representation of a Gogs authentication token
     """
     def __init__(self, token):
         """
@@ -31,7 +31,7 @@ class Token(Authentication):
     @property
     def token(self):
         """
-        The contents of the Gogs authenticatino token
+        The contents of the Gogs authentication token
 
         :rtype: str
         """
