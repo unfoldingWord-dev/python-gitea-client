@@ -11,8 +11,9 @@ class RelativeHttpRequestor(object):
     A thin wrapper around the requests module that allows for endpoint paths
     to be given relative to a fixed base URL
     """
-    def __init__(self, base_url):
+    def __init__(self, base_url, session=None):
         self.base_url = base_url
+        self.session = session or requests.Session()
 
     def absolute_url(self, relative_path):
         """
@@ -26,22 +27,22 @@ class RelativeHttpRequestor(object):
     # except that they expect relative paths
 
     def delete(self, relative_path, **kwargs):
-        return requests.delete(self.absolute_url(relative_path), **kwargs)
+        return self.session.delete(self.absolute_url(relative_path), **kwargs)
 
     def get(self, relative_path, params=None, **kwargs):
-        return requests.get(self.absolute_url(relative_path), params=params, **kwargs)
+        return self.session.get(self.absolute_url(relative_path), params=params, **kwargs)
 
     def options(self, relative_path, params=None, **kwargs):
-        return requests.options(self.absolute_url(relative_path), params=params, **kwargs)
+        return self.session.options(self.absolute_url(relative_path), params=params, **kwargs)
 
     def patch(self, relative_path, data=None, **kwargs):
-        return requests.patch(self.absolute_url(relative_path), data=data, **kwargs)
+        return self.session.patch(self.absolute_url(relative_path), data=data, **kwargs)
 
     def post(self, relative_path, data=None, **kwargs):
-        return requests.post(self.absolute_url(relative_path), data=data, **kwargs)
+        return self.session.post(self.absolute_url(relative_path), data=data, **kwargs)
 
     def put(self, relative_path, params=None, data=None, **kwargs):
-        return requests.put(self.absolute_url(relative_path), params=params, data=data, **kwargs)
+        return self.session.put(self.absolute_url(relative_path), params=params, data=data, **kwargs)
 
 
 def append_url(base_url, path):
