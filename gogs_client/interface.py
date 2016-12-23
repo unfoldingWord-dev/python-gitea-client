@@ -9,13 +9,14 @@ class GogsApi(object):
     A Gogs client, serving as a wrapper around the Gogs HTTP API.
     """
 
-    def __init__(self, base_url):
+    def __init__(self, base_url, session=None):
         """
         :param str base_url: the URL of the Gogs server to communicate with. Should be given
                              with the https protocol
+        :param str session: a requests session instance
         """
         api_base = append_url(base_url, "/api/v1/")
-        self._requestor = RelativeHttpRequestor(api_base)
+        self._requestor = RelativeHttpRequestor(api_base, session=session)
 
     def valid_authentication(self, auth):
         """
