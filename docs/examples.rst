@@ -46,3 +46,29 @@ Below is an example demonstrating how to update a user (requires admin privilege
         "username_to_update",
         update)
 
+
+Example 3: Creating a token
+---------------------------
+
+Below is an example illustrating how to create a token for you application::
+
+    import gogs_client
+    from getpass import getpass
+    from platform import node
+
+    api = GogsApi("https://try.gogs.io/")
+
+    try: token_str = open("tokenfile.txt","r").read()
+    except OSError: token_str = None
+    if token_str:
+        token = gogs_client.Token(token_str)
+    else:
+        username = input("username> ")
+        password = getpass("password> ")
+        login = gogs_client.UsernamePassword(username, password)
+        token = api.ensure_token(login, "my cool app on "+node(), username)
+        open("tokenfile.txt", "w".write(token.token))
+
+    username = api.authenticated_user(token)
+    print("User {} authenticated by token {}".format(username, token_str))
+
