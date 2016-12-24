@@ -43,11 +43,15 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "email": "u@gogs.io",
                   "avatar_url": "/avatars/1"
                 }"""
-        self.token = gogs_client.Token("mytoken")
+        self.token_json_str = """{
+                  "name": "new token",
+                  "sha1": "mytoken"
+                }"""
         self.username_password = gogs_client.UsernamePassword(
             "auth_username", "password")
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
+        self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
     def test_create_repo1(self):
@@ -238,6 +242,31 @@ class GogsClientInterfaceTest(unittest.TestCase):
         user = self.client.authenticated_user(self.token)
         self.assert_users_equals(user, self.expected_user)
 
+    @responses.activate
+    def test_ensure_token(self):
+        uri = self.path("/users/{}/tokens".format(self.username_password.username))
+        responses.add(responses.GET, uri, body="[]", status=200)
+        responses.add(responses.POST, uri, body=self.token_json_str, status=200)
+        responses.add(responses.GET, uri, body="["+self.token_json_str+"]", status=200)
+        token = self.client.ensure_token(self.username_password, self.token.name, self.username_password.username)
+        self.assert_tokens_equals(token, self.token)
+        token = self.client.ensure_token(self.username_password, self.token.name, self.username_password.username)
+        self.assert_tokens_equals(token, self.token)
+
+    @responses.activate
+    def test_ensure_auth_token(self):
+        uri = self.path("/user")
+        responses.add(responses.GET, uri, body=self.user_json_str, status=200)
+        uri = self.path("/users/{}/tokens".format(self.expected_user.username))
+        responses.add(responses.GET, uri, body="[]", status=200)
+        responses.add(responses.POST, uri, body=self.token_json_str, status=200)
+        tokens = self.client.get_tokens(self.username_password)
+        self.assertEqual(tokens, [])
+        tokeninfo = self.client.create_token(self.username_password, self.token.name)
+        self.assert_tokens_equals(tokeninfo, self.token)
+        token = self.client.ensure_token(self.username_password, self.token.name)
+        self.assert_tokens_equals(token, self.token)
+
     # helper methods
 
     @staticmethod
@@ -276,6 +305,10 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(user.full_name, expected.full_name)
         self.assertEqual(user.email, expected.email)
         self.assertEqual(user.avatar_url, expected.avatar_url)
+
+    def assert_tokens_equals(self, token, expected):
+        self.assertEqual(token.name, expected.name)
+        self.assertEqual(token.token, expected.token)
 
 
 if __name__ == "__main__":

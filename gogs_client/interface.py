@@ -2,6 +2,7 @@ import requests
 
 from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
 from gogs_client.entities import GogsUser, GogsRepo
+from gogs_client.auth import Token
 
 
 class GogsApi(object):
@@ -42,6 +43,68 @@ class GogsApi(object):
         """
         response = self._get("/user", auth=auth)
         return GogsUser.from_json(self._check_ok(response).json())
+
+    def get_tokens(self, auth, username=None):
+        """
+        Returns tokens defined for specified user.
+        If no user specified uses user authenticated by the given authentication.
+        Right now, authentication must be UsernamePassword (not Token).
+
+        :param auth.Authentication auth: authentication for user to retrieve
+        :param str username: username of owner of tokens
+
+        :return: list of token representation
+        :rtype: List[Token]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        if username is None:
+            username = self.authenticated_user(auth).username
+        response = self._get("/users/{u}/tokens".format(u=username), auth=auth)
+        return [Token.from_json(o) for o in self._check_ok(response).json()]
+
+    def create_token(self, auth, name, username=None):
+        """
+        Creates new token with specified name for specified user.
+        If no user specified uses user authenticated by the given authentication.
+        Right now, authentication must be UsernamePassword (not Token).
+
+        :param auth.Authentication auth: authentication for user to retrieve
+        :param str name: name of new token
+        :param str username: username of owner of new token
+
+        :return: new token representation
+        :rtype: Token
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        if username is None:
+            username = self.authenticated_user(auth).username
+        data = {"name": name}
+        response = self._post("/users/{u}/tokens".format(u=username), auth=auth, data=data)
+        return Token.from_json(self._check_ok(response).json())
+
+    def ensure_token(self, auth, name, username=None):
+        """
+        Creates new token if token with specified name for specified user does not exists.
+        If no user specified uses user authenticated by the given authentication.
+        Right now, authentication must be UsernamePassword (not Token).
+
+        :param auth.Authentication auth: authentication for user to retrieve
+        :param str name: name of new token
+        :param str username: username of owner of new token
+
+        :return: token representation
+        :rtype: Token
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        if username is None:
+            username = self.authenticated_user(auth).username
+        tokens = [token for token in self.get_tokens(auth, username) if token.name == name]
+        if tokens:
+            return tokens[0]
+        return self.create_token(auth, name, username)
 
     def create_repo(self, auth, name, description=None, private=False, auto_init=False,
                     gitignore_templates=None, license_template=None, readme_template=None):

@@ -1,6 +1,7 @@
 """
 Various classes for Gogs authentication
 """
+from gogs_client.entities import json_get
 
 
 class Authentication(object):
@@ -22,11 +23,27 @@ class Token(Authentication):
     """
     An immutable representation of a Gogs authentication token
     """
-    def __init__(self, token):
+    def __init__(self, token, name=None):
         """
         :param str token: contents of Gogs authentication token
         """
         self._token = token
+        self._name = name
+
+    @staticmethod
+    def from_json(parsed_json):
+        name = json_get(parsed_json, "name")
+        sha1 = json_get(parsed_json, "sha1")
+        return Token(sha1, name)
+
+    @property
+    def name(self):
+        """
+        The name of the token
+
+        :rtype: str
+        """
+        return self._name
 
     @property
     def token(self):
