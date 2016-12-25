@@ -21,7 +21,7 @@ class GogsApi(object):
 
     def valid_authentication(self, auth):
         """
-        Returns whether the provided authentication is valid
+        Returns whether ``auth`` is valid
 
         :param auth.Authentication auth: authentication object
         :return: whether the provided authentication is valid
@@ -32,11 +32,11 @@ class GogsApi(object):
 
     def authenticated_user(self, auth):
         """
-        Returns the user authenticated by the given authentication
+        Returns the user authenticated by ``auth``
 
         :param auth.Authentication auth: authentication for user to retrieve
 
-        :return: user corresponding to the provided authentication
+        :return: user authenticated by the provided authentication
         :rtype: GogsUser
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -46,14 +46,15 @@ class GogsApi(object):
 
     def get_tokens(self, auth, username=None):
         """
-        Returns tokens defined for specified user.
-        If no user specified uses user authenticated by the given authentication.
-        Right now, authentication must be UsernamePassword (not Token).
+        Returns the tokens owned by the specified user. If no user is specified,
+        uses the user authenticated by ``auth``.
 
-        :param auth.Authentication auth: authentication for user to retrieve
+        :param auth.Authentication auth: authentication for user to retrieve.
+        Must be a username-password authentication, due to a restriction of the
+        Gogs API
         :param str username: username of owner of tokens
 
-        :return: list of token representation
+        :return: list of tokens
         :rtype: List[Token]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -65,11 +66,12 @@ class GogsApi(object):
 
     def create_token(self, auth, name, username=None):
         """
-        Creates new token with specified name for specified user.
-        If no user specified uses user authenticated by the given authentication.
-        Right now, authentication must be UsernamePassword (not Token).
+        Creates a new token with the specified name for the specified user.
+        If no user is specified, uses user authenticated by ``auth``.
 
-        :param auth.Authentication auth: authentication for user to retrieve
+        :param auth.Authentication auth: authentication for user to retrieve.
+        Must be a username-password authentication, due to a restriction of the
+        Gogs API
         :param str name: name of new token
         :param str username: username of owner of new token
 
@@ -86,11 +88,13 @@ class GogsApi(object):
 
     def ensure_token(self, auth, name, username=None):
         """
-        Creates new token if token with specified name for specified user does not exists.
-        If no user specified uses user authenticated by the given authentication.
-        Right now, authentication must be UsernamePassword (not Token).
+        Ensures the existence of a token with the specified name for the
+        specified user. Creates a new token if none exists. If no user is
+        specified, uses user authenticated by ``auth``.
 
-        :param auth.Authentication auth: authentication for user to retrieve
+        :param auth.Authentication auth: authentication for user to retrieve.
+        Must be a username-password authentication, due to a restriction of the
+        Gogs API
         :param str name: name of new token
         :param str username: username of owner of new token
 
