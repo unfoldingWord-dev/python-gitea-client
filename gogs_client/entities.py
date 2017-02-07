@@ -240,3 +240,34 @@ class GogsRepo(object):
             :rtype: bool
             """
             return self._pull
+
+
+class GogsKey(object):
+
+    def __init__(self, title, key):
+        self._title = title
+        self._key = key
+
+    @staticmethod
+    def from_json(parsed_json):
+        title = json_get(parsed_json, 'title')
+        key = json_get(parsed_json, 'key')
+        return GogsKey(title, key)
+
+    @property
+    def title(self):
+        """
+        The title of the key
+
+        :rtype: str
+        """
+        return self._title
+
+    @property
+    def key(self):
+        """
+        The content of the key
+
+        :rtype: str
+        """
+        return self._key
