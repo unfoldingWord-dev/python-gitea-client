@@ -243,16 +243,29 @@ class GogsRepo(object):
 
 
 class GogsKey(object):
+    """
+    An immutable representation of a Gogs SSH keys
+    """
 
-    def __init__(self, title, key):
+    def __init__(self, key_id, title, key):
         self._title = title
         self._key = key
+        self._id = key_id
 
     @staticmethod
     def from_json(parsed_json):
         title = json_get(parsed_json, 'title')
         key = json_get(parsed_json, 'key')
-        return GogsKey(title, key)
+        key_id = json_get(parsed_json, 'id')
+        return GogsKey(key_id, title, key)
+
+    @property
+    def key_id(self):
+        """
+        The key id
+        :rtype: int
+        """
+        return self._id
 
     @property
     def title(self):

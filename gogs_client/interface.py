@@ -287,46 +287,52 @@ class GogsApi(object):
         path = "/admin/users/{}".format(username)
         self._check_ok(self._delete(path, auth=auth))
 
-    def get_keys(self, auth, username=None):
+    def get_keys(self, auth):
         """
-        Returns the keys owned by the specified user. If no user is specified,
-        uses the user authenticated by ``auth``.
+        Returns the keys owned by the specified user.
 
         :param auth.Authentication auth: authentication for user to retrieve.
-        :param str username: username of owner of keys
 
         :return: list of keys
         :rtype: List[GogsKey]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        if username is None:
-            username = self.authenticated_user(auth).username
-        response = self._get("/users/{u}/keys".format(u=username), auth=auth)
+        response = self._get("/user/keys", auth=auth)
         return [GogsKey.from_json(o) for o in self._check_ok(response).json()]
 
-    def create_key(self, auth, key, username=None):
+    def create_key(self, auth, key):
         """
         Creates a new key with the specified title for the specified user.
-        If no user is specified, uses user authenticated by ``auth``.
 
         :param auth.Authentication auth: authentication for user to retrieve.
         :param entities.GogsKey key: new key
-        :param str username: username of owner of new token
 
         :return: new key representation
         :rtype: GogsKey
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        if username is None:
-            username = self.authenticated_user(auth).username
         data = {
             "title": key.title,
             "key": key.key
         }
-        response = self._post("/user/keys".format(u=username), auth=auth, data=data)
+        response = self._post("/user/keys", auth=auth, data=data)
         return GogsKey.from_json(self._check_ok(response).json())
+
+    def delete_key(self, auth, key):
+        """
+        Delete the key  for the specified user.
+
+        :param auth.Authentication auth: authentication for user to retrieve.
+        :param entities.GogsKey key: key to delete
+
+        :return: new key representation
+        :rtype: GogsKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        self._check_ok(self._delete("/user/keys/{}".format(key.key_id), auth=auth))
 
     # Helper methods
 
