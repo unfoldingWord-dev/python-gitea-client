@@ -301,12 +301,13 @@ class GogsApi(object):
         response = self._get("/user/keys", auth=auth)
         return [GogsKey.from_json(o) for o in self._check_ok(response).json()]
 
-    def create_key(self, auth, key):
+    def create_key(self, auth, title, key):
         """
         Creates a new key with the specified title for the specified user.
 
         :param auth.Authentication auth: authentication for user to retrieve.
-        :param entities.GogsKey key: new key
+        :param str title: title for new key
+        :param str key: key content
 
         :return: new key representation
         :rtype: GogsKey
@@ -314,8 +315,8 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         data = {
-            "title": key.title,
-            "key": key.key
+            "title": title,
+            "key": key
         }
         response = self._post("/user/keys", auth=auth, data=data)
         return GogsKey.from_json(self._check_ok(response).json())
