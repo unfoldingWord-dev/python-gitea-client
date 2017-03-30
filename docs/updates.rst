@@ -8,3 +8,9 @@ Updates
 
 .. autoclass:: gogs_client.updates::GogsUserUpdate.Builder()
     :members:
+
+.. autoclass:: GogsHookUpdate()
+    :members:
+
+.. autoclass:: gogs_client.updates::GogsHookUpdate.Builder()
+    :members:

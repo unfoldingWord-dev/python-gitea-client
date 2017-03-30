@@ -182,3 +182,82 @@ class GogsUserUpdate(object):
                 admin=self._admin,
                 allow_git_hook=self._allow_git_hook,
                 allow_import_local=self._allow_import_local)
+
+
+class GogsHookUpdate(object):
+    """
+    An immutable represention of a collection of Gogs hook attributes to update.
+
+    Instances should be created using the :class:`~GogsHookUpdate.Builder` class.
+    """
+    def __init__(self, hook_type, events, config, active):
+        """
+        :param hook_type:
+        :param events:
+        :param config:
+        :param active:
+        """
+
+        self._type = hook_type
+        self._events = events
+        self._config = config
+        self._active = active
+
+    def as_dict(self):
+        fields = {
+            "type": self._type,
+            "events": self._events,
+            "config": self._config,
+            "active": self._active,
+        }
+        return {k: v for (k, v) in fields.items() if v is not None}
+
+    class Builder(object):
+        def __init__(self):
+            """
+            :param str login_name: login name for authentication source
+            :param str email: email address of user to update
+            """
+            self._type = None
+            self._events = None
+            self._config = None
+            self._active = None
+
+
+        def set_events(self, events):
+            """
+            :param list events:
+            :return: the updated builder
+            :rtype: GogsHookUpdate.Builder
+            """
+            self._events = events
+            return self
+
+        def set_config(self, config):
+            """
+            :param dict config:
+            :return: the updated builder
+            :rtype: GogsHookUpdate.Builder
+            """
+            self._config = config
+            return self
+
+        def set_active(self, active):
+            """
+            :param bool active:
+            :return: the updated builder
+            :rtype: GogsHookUpdate.Builder
+            """
+            self._active = active
+            return self
+
+        def build(self):
+            """
+            :return: A :class:`~GogsHookUpdate` instance reflecting the changes added to the builder.
+            :rtype: GogsHookUpdate
+            """
+            return GogsHookUpdate(
+                hook_type=self._type,
+                events=self._events,
+                config=self._config,
+                active=self._active)

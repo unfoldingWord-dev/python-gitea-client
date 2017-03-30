@@ -240,3 +240,70 @@ class GogsRepo(object):
             :rtype: bool
             """
             return self._pull
+
+    class Hook(object):
+        def __init__(self, hook_id, hook_type, events, active, config):
+            self._id = hook_id
+            self._type = hook_type
+            self._events = events
+            self._active = active
+            self._config = config
+
+        @staticmethod
+        def from_json(parsed_json):
+            hook_id = json_get(parsed_json, "id")
+            hook_type = json_get(parsed_json, "type")
+            events = json_get(parsed_json, "events")
+            active = json_get(parsed_json, "active")
+            config = json_get(parsed_json, "config")
+
+            return GogsRepo.Hook(hook_id=hook_id, hook_type=hook_type, events=events, active=active, 
+                            config=config)
+
+        @property  # named hook_id to avoid conflict with built-in id
+        def hook_id(self):
+            """
+            The hook's id number
+
+            :rtype: int
+            """
+            return self._id
+
+        @property  # named hook_type to avoid conflict with built-in type
+        def hook_type(self):
+            """
+            The hook's type (gogs, slack, etc.)
+
+            :rtype: str
+            """
+            return self._type
+
+        @property
+        def events(self):
+            """
+            The events that fires the hook
+
+            :rtype: list of strs
+            """
+            return self._events
+
+        @property
+        def active(self):
+            """
+            State of the hook
+
+            :rtype: bool
+            """
+            return self._active
+
+        @property
+        def config(self):
+            """
+            Config of the hook. Contains max. 3 keys:
+                - content_type
+                - url
+                - secret
+
+            :rtype: dict
+            """
+            return self._config

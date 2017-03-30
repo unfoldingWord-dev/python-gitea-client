@@ -17,3 +17,6 @@ This pages documents classes provided by ``gogs_client`` module that represent e
 
 .. autoclass:: gogs_client.entities::GogsRepo.Permissions()
     :members:
+
+.. autoclass:: gogs_client.entities::GogsRepo.Hook()
+    :members:

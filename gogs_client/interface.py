@@ -290,6 +290,69 @@ class GogsApi(object):
         path = "/admin/users/{}".format(username)
         self._check_ok(self._delete(path, auth=auth))
 
+    def get_repo_hooks(self, auth, username, repo_name):
+        """
+        Returns all hooks of repository with name ``repo_name`` owned by
+        the user with username ``username``.
+
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
+        :param str repo_name: name of repository
+        :return: a list of hooks for the specified repository
+        :rtype: List[GogsRepo.Hooks]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{u}/{r}/hooks".format(u=username, r=repo_name)
+        response = self._check_ok(self._get(path, auth=auth))
+        hooks = [GogsRepo.Hook.from_json(hook) for hook in response.json()]
+        return hooks
+
+    def create_hook(self, auth, repo_name, hook_type, config, events=["push"], organization=None, active=False):
+        """
+        Creates a new hook, and returns the created hook.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str repo_name: the name of the repo for which we create the hook
+        :param str hook_type: The type of webhook, either "gogs" or "slack"
+        :param dict config: Key/value pairs to provide settings for this hook ("url", "content_type", "secret")
+        :param list events: Determines what events the hook is triggered for. Default: ["push"]
+        :param str organization: (Optional) Organization of the repo
+        :param bool active: Determines whether the hook is actually triggered on pushes. Default is false
+        :return: a representation of the created hook
+        :rtype: GogsRepo.Hook
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+
+        data = {
+            "type": hook_type,
+            "config": config,
+            "events": events,
+            "active": active
+        }
+
+        url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization else "/repos/{r}/hooks".format(r=repo_name)
+        response = self._post(url, auth=auth, data=data)
+        print response.text
+        self._check_ok(response)
+        return GogsRepo.Hook.from_json(response.json())
+
+    def delete_hook(self, auth, username, repo_name, hook_id):
+        """
+        Deletes the hook with id ``hook_id`` for repo with name ``repo_name``
+        owned by the user with username ``username``.
+
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
+        :param str repo_name: name of repository of hook to delete
+        :param int hook_id: id of hook to delete
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{u}/{r}/hooks/{i}".format(u=username, r=repo_name, i=hook_id)
+        self._check_ok(self._delete(path, auth=auth))
+
     # Helper methods
 
     def _delete(self, path, auth=None, **kwargs):
