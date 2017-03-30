@@ -1,7 +1,7 @@
 import requests
 
 from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
-from gogs_client.entities import GogsUser, GogsRepo
+from gogs_client.entities import GogsUser, GogsRepo, GogsKey
 from gogs_client.auth import Token
 
 
@@ -289,6 +289,54 @@ class GogsApi(object):
         """
         path = "/admin/users/{}".format(username)
         self._check_ok(self._delete(path, auth=auth))
+
+    def get_keys(self, auth):
+        """
+        Returns the keys owned by the specified user.
+
+        :param auth.Authentication auth: authentication for user to retrieve.
+
+        :return: list of keys
+        :rtype: List[GogsKey]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        response = self._get("/user/keys", auth=auth)
+        return [GogsKey.from_json(o) for o in self._check_ok(response).json()]
+
+    def create_key(self, auth, title, key):
+        """
+        Creates a new key with the specified title for the specified user.
+
+        :param auth.Authentication auth: authentication for user to retrieve.
+        :param str title: title for new key
+        :param str key: key content
+
+        :return: new key representation
+        :rtype: GogsKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        data = {
+            "title": title,
+            "key": key
+        }
+        response = self._post("/user/keys", auth=auth, data=data)
+        return GogsKey.from_json(self._check_ok(response).json())
+
+    def delete_key(self, auth, key):
+        """
+        Delete the key  for the specified user.
+
+        :param auth.Authentication auth: authentication for user to retrieve.
+        :param entities.GogsKey key: key to delete
+
+        :return: new key representation
+        :rtype: GogsKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        self._check_ok(self._delete("/user/keys/{}".format(key.key_id), auth=auth))
 
     # Helper methods
 
