@@ -111,7 +111,8 @@ class GogsApi(object):
         return self.create_token(auth, name, username)
 
     def create_repo(self, auth, name, description=None, private=False, auto_init=False,
-                    gitignore_templates=None, license_template=None, readme_template=None):
+                    gitignore_templates=None, license_template=None, readme_template=None,
+                    organization=None):
         """
         Creates a new repository, and returns the created repository.
 
@@ -123,6 +124,7 @@ class GogsApi(object):
         :param list[str] gitignore_templates: collection of ``.gitignore`` templates to apply
         :param str license_template: license template to apply
         :param str readme_template: README template to apply
+        :param str organization: organization under which repository is created
         :return: a representation of the created repository
         :rtype: GogsRepo
         :raises NetworkFailure: if there is an error communicating with the server
@@ -140,7 +142,8 @@ class GogsApi(object):
             "readme": readme_template
         }
         data = {k: v for (k, v) in data.items() if v is not None}
-        response = self._post("/user/repos", auth=auth, data=data)
+        url = "/org/{0}/repos".format(organization) if organization else "/user/repos"
+        response = self._post(url, auth=auth, data=data)
         return GogsRepo.from_json(self._check_ok(response).json())
 
     def repo_exists(self, auth, username, repo_name):
