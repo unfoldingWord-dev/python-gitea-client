@@ -334,8 +334,23 @@ class GogsApi(object):
 
         url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization else "/repos/{r}/hooks".format(r=repo_name)
         response = self._post(url, auth=auth, data=data)
-        print response.text
         self._check_ok(response)
+        return GogsRepo.Hook.from_json(response.json())
+
+    def update_hook(self, auth, repo_name, hook_id, update, organization=None):
+        """
+        Updates hook  with id ``hook_id`` according to ``update``.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str repo_name: repo of the hook to update
+        :param GogsHookUpdate update: a ``GogsHookUpdate`` object describing the requested update
+        :return: the updated hook
+        :rtype: GogsRepo.Hook
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{o}/{r}/hooks/{i}".format(o=organization, r=repo_name, i=hook_id) if organization else "/repos/{r}/hooks/{i}".format(r=repo_name, i=hook_id)
+        response = self._check_ok(self._patch(path, auth=auth, data=update.as_dict()))
         return GogsRepo.Hook.from_json(response.json())
 
     def delete_hook(self, auth, username, repo_name, hook_id):

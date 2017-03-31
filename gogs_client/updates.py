@@ -190,22 +190,19 @@ class GogsHookUpdate(object):
 
     Instances should be created using the :class:`~GogsHookUpdate.Builder` class.
     """
-    def __init__(self, hook_type, events, config, active):
+    def __init__(self, events, config, active):
         """
-        :param hook_type:
         :param events:
         :param config:
         :param active:
         """
 
-        self._type = hook_type
         self._events = events
         self._config = config
         self._active = active
 
     def as_dict(self):
         fields = {
-            "type": self._type,
             "events": self._events,
             "config": self._config,
             "active": self._active,
@@ -218,11 +215,9 @@ class GogsHookUpdate(object):
             :param str login_name: login name for authentication source
             :param str email: email address of user to update
             """
-            self._type = None
             self._events = None
             self._config = None
             self._active = None
-
 
         def set_events(self, events):
             """
@@ -257,7 +252,6 @@ class GogsHookUpdate(object):
             :rtype: GogsHookUpdate
             """
             return GogsHookUpdate(
-                hook_type=self._type,
                 events=self._events,
                 config=self._config,
                 active=self._active)

@@ -260,6 +260,16 @@ class GogsRepo(object):
             return GogsRepo.Hook(hook_id=hook_id, hook_type=hook_type, events=events, active=active, 
                             config=config)
 
+        def as_dict(self):
+            fields = {
+                "id": self._id,
+                "type": self._type,
+                "events": self._events,
+                "config": self._config,
+                "active": self._active,
+            }
+            return {k: v for (k, v) in fields.items() if v is not None}
+
         @property  # named hook_id to avoid conflict with built-in id
         def hook_id(self):
             """

@@ -36,13 +36,13 @@ class RelativeHttpRequestor(object):
         return self.session.options(self.absolute_url(relative_path), params=params, **kwargs)
 
     def patch(self, relative_path, data=None, **kwargs):
-        return self.session.patch(self.absolute_url(relative_path), data=data, **kwargs)
+        return self.session.patch(self.absolute_url(relative_path), json=data, **kwargs)
 
     def post(self, relative_path, data=None, **kwargs):
-        return self.session.post(self.absolute_url(relative_path), data=data, **kwargs)
+        return self.session.post(self.absolute_url(relative_path), json=data, **kwargs)
 
     def put(self, relative_path, params=None, data=None, **kwargs):
-        return self.session.put(self.absolute_url(relative_path), params=params, data=data, **kwargs)
+        return self.session.put(self.absolute_url(relative_path), params=params, json=data, **kwargs)
 
 
 def append_url(base_url, path):
