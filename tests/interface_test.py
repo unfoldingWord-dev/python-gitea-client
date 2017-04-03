@@ -202,7 +202,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             .build()
 
         def callback(request):
-            data = json.loads(request.body)
+            data = json.loads(request.body.decode('utf8'))
             self.assertEqual(data["login_name"], "loginname")
             self.assertEqual(data["full_name"], "Example User")
             self.assertEqual(data["email"], "user@example.com")
@@ -313,7 +313,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             .build()
 
         def callback(request):
-            data = json.loads(request.body)
+            data = json.loads(request.body.decode('utf8'))
             self.assertEqual(data["config"]["url"], "http://newurl.com/hook")
             self.assertEqual(data["events"], ['issues_comments'])
             self.assertEqual(data["active"], True)
