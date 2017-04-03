@@ -317,3 +317,169 @@ class GogsRepo(object):
             :rtype: dict
             """
             return self._config
+
+
+class GogsOrg(object):
+    """
+     An immutable representation of a Gogs Organization.
+    """
+    def __init__(self, org_id, username, full_name, avatar_url, description, website, location):
+        self._id = org_id
+        self._username = username
+        self._full_name = full_name
+        self._avatar_url = avatar_url
+        self._description = description
+        self._website = website
+        self._location = location
+
+    @staticmethod
+    def from_json(parsed_json):
+        org_id = json_get(parsed_json, "id")
+        username = json_get(parsed_json, "username")
+        full_name = json_get(parsed_json, "full_name")
+        avatar_url = json_get(parsed_json, "avatar_url")
+        description = json_get(parsed_json, "description")
+        website = json_get(parsed_json, "website")
+        location = json_get(parsed_json, "location")
+        return GogsOrg(org_id=org_id, username=username, full_name=full_name,
+                        avatar_url=avatar_url, description=description,
+                        website=website, location=location)
+
+    def as_dict(self):
+        fields = {
+            "id": self._id,
+            "username": self._username,
+            "full_name": self._full_name,
+            "avatar_url": self._avatar_url,
+            "description": self._description,
+            "website": self._website,
+            "location": self._location
+        }
+        return {k: v for (k, v) in fields.items() if v is not None}
+
+    @property  # named org_id to avoid conflict with built-in id
+    def org_id(self):
+        """
+        The organization's id
+
+        :rtype: int
+        """
+        return self._id
+
+    @property  
+    def username(self):
+        """
+        Organization's username
+
+        :rtype: int
+        """
+        return self._username
+
+    @property  
+    def full_name(self):
+        """
+        Organization's full name
+
+        :rtype: int
+        """
+        return self._full_name 
+
+    @property  
+    def avatar_url(self):
+        """
+        Organization's avatar url
+
+        :rtype: str
+        """
+        return self._avatar_url 
+
+    @property  
+    def description(self):
+        """
+        Organization's description
+
+        :rtype: str
+        """
+        return self._description 
+
+    @property  
+    def website(self):
+        """
+        Organization's website address
+
+        :rtype: str
+        """
+        return self._website 
+
+    @property  
+    def location(self):
+        """
+        Organization's location
+
+        :rtype: str
+        """
+        return self._location 
+
+    class Team(object):
+        """
+        Team of an organization
+        """
+        def __init__(self, team_id, name, description, permission):
+            self._id = team_id
+            self._name = name
+            self._description = description
+            self._permission = permission
+
+        @staticmethod
+        def from_json(parsed_json):
+            team_id = json_get(parsed_json, "id")
+            name = json_get(parsed_json, "name")
+            description = json_get(parsed_json, "description")
+            permission = json_get(parsed_json, "permission")
+            return GogsOrg.Team(team_id=team_id, name=name, description=description, permission=permission)
+
+        def as_dict(self):
+            fields = {
+                "team_id": self._id,
+                "name": self._name,
+                "description": self._description,
+                "permission": self._permission,
+            }
+            return {k: v for (k, v) in fields.items() if v is not None}
+
+        @property  # named team_id to avoid conflict with built-in id
+        def team_id(self):
+            """
+            Team's id
+
+            :rtype: int
+            """
+            return self._id 
+
+        @property
+        def name(self):
+            """
+            Team name
+
+            :rtype: int
+            """
+            return self._name
+
+        @property
+        def description(self):
+            """
+            Description to the team
+
+            :rtype: int
+            """
+            return self._description
+
+        @property
+        def permission(self):
+            """
+            Team permission, can be read, write or admin, default is read
+
+            :rtype: int
+            """
+            return self._permission
+
