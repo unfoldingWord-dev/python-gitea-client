@@ -1,7 +1,7 @@
 import requests
 
 from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
-from gogs_client.entities import GogsUser, GogsRepo
+from gogs_client.entities import GogsUser, GogsRepo, GogsOrg
 from gogs_client.auth import Token
 
 
@@ -369,6 +369,126 @@ class GogsApi(object):
         response = self._check_ok(self._delete(path, auth=auth))
         return response
 
+    def create_organization(self, auth, username, org_name, full_name=None, avatar_url=None, description=None, website=None, location=None):
+        """
+        Creates a new organization, and returns the created one.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str username: [Required] Organization user name
+        :param str full_name: Full name of organization 
+        :param str description: Description to the organization
+        :param str website: Official website
+        :param str location: Organization location
+        :return: a representation of the created organization
+        :rtype: GogsOrg
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+
+        data = {
+          "username": org_name,
+          "full_name": full_name,
+          "description": description,
+          "website": website,
+          "location": location
+        }
+
+        url = "/admin/users/{u}/orgs".format(u=username) 
+        response = self._post(url, auth=auth, data=data)
+        self._check_ok(response)
+        return GogsOrg.from_json(response.json())
+
+    def create_organization_team(self, auth, org_name, name, description=None, permission="read"):
+        """
+        Creates a new team of the organization.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str org_name: [Required] Organization user name
+        :param str team_name: Full name of the team
+        :param str description: Description to the team
+        :param str permission: Team permission, can be read, write or admin, default is read
+        :return: a representation of the created team
+        :rtype: GogsOrg.Team
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+
+        data = {
+          "name": name,
+          "description": description,
+          "permission": permission
+        }
+
+        url = "/admin/orgs/{o}/teams".format(o=org_name) 
+        response = self._post(url, auth=auth, data=data)
+        self._check_ok(response)
+        return GogsOrg.Team.from_json(response.json())
+
+    def add_team_membership(self, auth, team_id, username):
+        """
+        Add user to team.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str team_id: [Required] Id of the team
+        :param str username: Username of the user to be added to team
+        :return: status code of the request
+        :rtype: str
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
+        response = self._put(url, auth=auth)
+        return self._check_ok(response)
+
+    def remove_team_membership(self, auth, team_id, username):
+        """
+        Remove user from team.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str team_id: [Required] Id of the team
+        :param str username: Username of the user to be removed from the team
+        :return: status code of the request
+        :rtype: str
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
+        response = self._delete(url, auth=auth)
+        return self._check_ok(response)
+
+    def add_repo_to_team(self, auth, team_id, repo_name):
+        """
+        Add or update repo from team.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str team_id: [Required] Id of the team
+        :param str repo_name: Name of the repo to be added to the team
+        :return: status code of the request
+        :rtype: str
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
+        response = self._put(url, auth=auth)
+        return self._check_ok(response)
+
+
+    def remove_repo_from_team(self, auth, team_id, repo_name):
+        """
+        Remove repo from team.
+
+        :param auth.Authentication auth: authentication object, must be admin-level
+        :param str team_id: [Required] Id of the team
+        :param str repo_name: Name of the repo to be removed from the team
+        :return: status code of the request
+        :rtype: str
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
+        response = self._delete(url, auth=auth)
+        return self._check_ok(response)
+
     # Helper methods
 
     def _delete(self, path, auth=None, **kwargs):
@@ -403,6 +523,14 @@ class GogsApi(object):
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
 
+    def _put(self, path, auth=None, **kwargs):
+        if auth is not None:
+            auth.update_kwargs(kwargs)
+        try:
+            return self._requestor.put(path, **kwargs)
+        except requests.RequestException as exc:
+            raise NetworkFailure(exc)
+
     @staticmethod
     def _check_ok(response):
         """
@@ -419,7 +547,7 @@ class GogsApi(object):
         """
         message = "Status code: {}-{}, url: {}".format(response.status_code, response.reason, response.url)
         try:
-            message += ", message:{}".format(response.json()[0]["message"])
+            message += ", message:{}".format(response.json()["message"])
         except Exception:
             pass
         raise ApiFailure(message, response.status_code)
