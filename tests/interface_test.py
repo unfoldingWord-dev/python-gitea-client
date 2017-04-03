@@ -65,7 +65,38 @@ class GogsClientInterfaceTest(unittest.TestCase):
                 "updated_at": "2017-03-31T12:42:58Z",
                 "created_at": "2017-03-31T12:42:58Z"
               }"""
-
+        self.hooks_list_json_str = """[
+              {
+                "id": 4,
+                "type": "gogs",
+                "config": {
+                  "content_type": "json",
+                  "url": "http://test.io/hook"
+                },
+                "events": [
+                  "create",
+                  "push",
+                  "issues"
+                ],
+                "active": false,
+                "updated_at": "2017-03-31T12:42:58Z",
+                "created_at": "2017-03-31T12:42:58Z"
+              },
+              {
+                "id": 3,
+                "type": "gogs",
+                "config": {
+                  "content_type": "json",
+                  "url": "http://192.168.201.1:8080/hook22/"
+                },
+                "events": [
+                  "issue_comment"
+                ],
+                "active": true,
+                "updated_at": "2017-03-31T12:47:56Z",
+                "created_at": "2017-03-31T12:42:54Z"
+              }
+            ]"""
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
         self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
@@ -323,6 +354,20 @@ class GogsClientInterfaceTest(unittest.TestCase):
         hook = self.client.update_hook(self.token, "repo1", 4, update, organization="username")
         self.assert_hooks_equals(hook, self.expected_hook)
 
+    @responses.activate
+    def test_list_hooks(self):
+        uri = self.path("/repos/username/repo1/hooks")
+        responses.add(responses.GET, uri, body=self.hooks_list_json_str, status=20)
+        hooks = self.client.get_repo_hooks(self.token, "username", "repo1")
+        self.assertEqual(len(hooks), 2)
+        self.assert_hooks_equals(hooks[0], self.expected_hook)
+
+    @responses.activate
+    def test_delete_hook(self):
+        uri = self.path("/repos/username/repo1/hooks/4")
+        responses.add(responses.DELETE, uri, status=204)
+        hook = self.client.delete_hook(self.token, "username", "repo1", 4)
+        self.assertEqual(hook.status_code, 204)
 
     # helper methods
 

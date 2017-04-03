@@ -366,7 +366,8 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/hooks/{i}".format(u=username, r=repo_name, i=hook_id)
-        self._check_ok(self._delete(path, auth=auth))
+        response = self._check_ok(self._delete(path, auth=auth))
+        return response
 
     # Helper methods
 
