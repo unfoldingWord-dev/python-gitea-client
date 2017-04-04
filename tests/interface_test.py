@@ -112,11 +112,35 @@ class GogsClientInterfaceTest(unittest.TestCase):
               "description": "A new team created by API",
               "permission": "write"
             }"""
+        self.deploy_key_json_str = """{
+              "id": 1,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            }"""
+        self.deploy_key_json_list = """[{
+              "id": 1,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            },{
+              "id": 2,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            }]"""
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
         self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
         self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
         self.expected_team = gogs_client.GogsOrg.Team.from_json(json.loads(self.team_json_str))
+        self.expected_key = gogs_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
         self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
@@ -374,7 +398,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
     @responses.activate
     def test_list_hooks(self):
         uri = self.path("/repos/username/repo1/hooks")
-        responses.add(responses.GET, uri, body=self.hooks_list_json_str, status=20)
+        responses.add(responses.GET, uri, body=self.hooks_list_json_str, status=200)
         hooks = self.client.get_repo_hooks(self.token, "username", "repo1")
         self.assertEqual(len(hooks), 2)
         self.assert_hooks_equals(hooks[0], self.expected_hook)
@@ -444,6 +468,38 @@ class GogsClientInterfaceTest(unittest.TestCase):
         resp = self.client.remove_repo_from_team(self.token, "test_team", "repo_name")
         self.assertEqual(resp.status_code, 204)
 
+    @responses.activate
+    def test_list_deploy_keys(self):
+        uri = self.path("/repos/username/repo1/keys")
+        responses.add(responses.GET, uri, body=self.deploy_key_json_list, status=200)
+        keys = self.client.list_deploy_keys(self.token, "username", "repo1")
+        self.assertEqual(len(keys), 2)
+        self.assert_keys_equals(keys[0], self.expected_key)
+
+    @responses.activate
+    def test_delete_deploy_keys(self):
+        uri = self.path("/repos/username/repo1/keys/1")
+        responses.add(responses.DELETE, uri, status=204)
+        key = self.client.delete_deploy_key(self.token, "username", "repo1", 1)
+        self.assertEqual(key.status_code, 204)
+
+    @responses.activate
+    def test_get_deploy_key(self):
+        uri = self.path("/repos/username/repo1/keys/1")
+        responses.add(responses.GET, uri, body=self.deploy_key_json_str)
+        key = self.client.get_deploy_key(self.token, "username", "repo1", 1)
+        self.assert_keys_equals(key, self.expected_key)
+
+    @responses.activate
+    def test_add_deploy_key(self):
+        uri = self.path("/repos/username/repo1/keys")
+        responses.add(responses.POST, uri, body=self.deploy_key_json_str)
+        key_title = "My key title"
+        key_content = "My key content"
+        key = self.client.add_deploy_key(self.token, "username", "repo1", key_title, key_content)
+        self.assert_keys_equals(key, self.expected_key)
+
+
     # helper methods
 
     @staticmethod
@@ -508,6 +564,14 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(team.name, expected.name)
         self.assertEqual(team.description, expected.description)
         self.assertEqual(team.permission, expected.permission)
+
+    def assert_keys_equals(self, key, expected):
+        self.assertEqual(key.key_id, expected.key_id)
+        self.assertEqual(key.title, expected.title)
+        self.assertEqual(key.url, expected.url)
+        self.assertEqual(key.key, expected.key)
+        self.assertEqual(key.read_only, expected.read_only)
+        self.assertEqual(key.created_at, expected.created_at)
 
 if __name__ == "__main__":
     unittest.main()
