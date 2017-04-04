@@ -97,9 +97,26 @@ class GogsClientInterfaceTest(unittest.TestCase):
                 "created_at": "2017-03-31T12:42:54Z"
               }
             ]"""
+        self.org_json_str = """{
+              "id": 7,
+              "username": "gogs2",
+              "full_name": "Gogs2",
+              "avatar_url": "/avatars/7",
+              "description": "Gogs is a painless self-hosted Git Service.",
+              "website": "https://gogs.io",
+              "location": "USA"
+            }"""
+        self.team_json_str = """{
+              "id": 12,
+              "name": "new-team",
+              "description": "A new team created by API",
+              "permission": "write"
+            }"""
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
         self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
+        self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
+        self.expected_team = gogs_client.GogsOrg.Team.from_json(json.loads(self.team_json_str))
         self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
@@ -369,6 +386,64 @@ class GogsClientInterfaceTest(unittest.TestCase):
         hook = self.client.delete_hook(self.token, "username", "repo1", 4)
         self.assertEqual(hook.status_code, 204)
 
+    @responses.activate
+    def test_create_organization(self):
+        uri =  self.path("/admin/users/username/orgs")
+        responses.add(responses.POST, uri, body=self.org_json_str)
+        org = self.client.create_organization(self.token, 
+            username="username", 
+            org_name="gogs2", 
+            full_name="Gogs2",
+            description="Gogs is a painless self-hosted Git Service.",
+            website="https://gogs.io",
+            location="USA")
+        self.assert_org_equals(org, self.expected_org)
+        self.assertEqual(len(responses.calls), 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
+
+    @responses.activate
+    def test_create_organization_team(self):
+        uri =  self.path("/admin/orgs/username/teams")
+        responses.add(responses.POST, uri, body=self.team_json_str)
+        team = self.client.create_organization_team(self.token, 
+            org_name="username", 
+            name="new-team", 
+            description="A new team created by API",
+            permission="write")
+        self.assert_team_equals(team, self.expected_team)
+        self.assertEqual(len(responses.calls), 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
+
+    @responses.activate
+    def test_add_team_membership(self):
+        uri = self.path("/admin/teams/team/members/username")
+        responses.add(responses.PUT, uri, status=204)
+        resp = self.client.add_team_membership(self.token, "team", "username")
+        self.assertEqual(resp.status_code, 204)
+
+    @responses.activate
+    def test_remove_team_membership(self):
+        uri = self.path("/admin/teams/team/members/username")
+        responses.add(responses.DELETE, uri, status=204)
+        resp = self.client.remove_team_membership(self.token, "team", "username")
+        self.assertEqual(resp.status_code, 204)
+
+    @responses.activate
+    def test_add_repo_to_team(self):
+        uri = self.path("/admin/teams/test_team/repos/repo_name")
+        responses.add(responses.PUT, uri, status=204)
+        resp = self.client.add_repo_to_team(self.token, "test_team", "repo_name")
+        self.assertEqual(resp.status_code, 204)
+
+    @responses.activate
+    def test_remove_repo_from_team(self):
+        uri = self.path("/admin/teams/test_team/repos/repo_name")
+        responses.add(responses.DELETE, uri, status=204)
+        resp = self.client.remove_repo_from_team(self.token, "test_team", "repo_name")
+        self.assertEqual(resp.status_code, 204)
+
     # helper methods
 
     @staticmethod
@@ -418,6 +493,21 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(hook.events, expected.events)
         self.assertEqual(hook.config, expected.config)
         self.assertEqual(hook.active, expected.active)
+
+    def assert_org_equals(self, org, expected):
+        self.assertEqual(org.org_id, expected.org_id)
+        self.assertEqual(org.username, expected.username)
+        self.assertEqual(org.full_name, expected.full_name)
+        self.assertEqual(org.avatar_url, expected.avatar_url)
+        self.assertEqual(org.description, expected.description)
+        self.assertEqual(org.website, expected.website)
+        self.assertEqual(org.location, expected.location)
+
+    def assert_team_equals(self, team, expected):
+        self.assertEqual(team.team_id, expected.team_id)
+        self.assertEqual(team.name, expected.name)
+        self.assertEqual(team.description, expected.description)
+        self.assertEqual(team.permission, expected.permission)
 
 if __name__ == "__main__":
     unittest.main()
