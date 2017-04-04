@@ -489,6 +489,72 @@ class GogsApi(object):
         response = self._delete(url, auth=auth)
         return self._check_ok(response)
 
+    def list_deploy_keys(self, auth, username, repo_name):
+        """
+        List deploy keys.
+
+        :param str username: username or organization
+        :param str repo_name: the name of the repo
+        :return: a list of deploy keys for the repo
+        :rtype: List[GogsRepo.DeployKey]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        response = self._check_ok(self._get("/repos/{u}/{r}/keys".format(u=username, r=repo_name),auth=auth))
+        return [GogsRepo.DeployKey.from_json(key_json) for key_json in response.json()]
+
+    def get_deploy_key(self, auth, username, repo_name, key_id):
+        """
+        Get deploy key for specific repo.
+
+        :param str username: username or organization
+        :param str repo_name: the name of the repo
+        :param int key_id: the id of the key
+        :return: the deploy key
+        :rtype: GogsRepo.DeployKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+
+        response = self._check_ok(self._get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
+        return GogsRepo.DeployKey.from_json(response.json())
+
+    def add_deploy_key(self, auth, username, repo_name, title, key):
+        """
+        Get deploy key for specific repo.
+
+        :param str username: username or organization
+        :param str repo_name: the name of the repo
+        :param int key_id: the id of the key
+        :return: the deploy key
+        :rtype: GogsRepo.DeployKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        data = {
+            "title": title,
+            "key": key
+        }
+        response = self._check_ok(self._post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data))
+        return GogsRepo.DeployKey.from_json(response.json())
+
+    def delete_deploy_key(self, auth, username, repo_name, key_id):
+        """
+        Remove deploy key for specific repo.
+
+        :param str username: username or organization
+        :param str repo_name: the name of the repo
+        :param int key_id: the id of the key
+        :return: the deploy key
+        :rtype: GogsRepo.DeployKey
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+
+        response = self._check_ok(self._delete("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
+        return self._check_ok(response)
+
+
     # Helper methods
 
     def _delete(self, path, auth=None, **kwargs):
