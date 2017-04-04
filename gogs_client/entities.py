@@ -318,6 +318,89 @@ class GogsRepo(object):
             """
             return self._config
 
+    class DeployKey(object):
+        def __init__(self, key_id, key, url, title, created_at, read_only):
+            self._id = key_id
+            self._key = key
+            self._url = url
+            self._title = title
+            self._created_at = created_at
+            self._read_only = read_only
+
+        @staticmethod
+        def from_json(parsed_json):
+            key_id = json_get(parsed_json, "id")
+            key = json_get(parsed_json, "key")
+            url = json_get(parsed_json, "url")
+            title = json_get(parsed_json, "title")
+            created_at = json_get(parsed_json, "created_at")
+            read_only = json_get(parsed_json, "read_only")
+
+            return GogsRepo.DeployKey(key_id=key_id, key=key, url=url, 
+                            title=title, created_at=created_at, read_only=read_only)
+
+        def as_dict(self):
+            fields = {
+                "id": self._id,
+                "key": self._key,
+                "url": self._url,
+                "title": self._title,
+                "created_at": self._created_at,
+                "read_only": self._read_only,
+            }
+            return {k: v for (k, v) in fields.items() if v is not None}
+
+        @property  # named key_id to avoid conflict with built-in id
+        def key_id(self):
+            """
+            The key's id number
+
+            :rtype: int
+            """
+            return self._id
+
+        @property
+        def key(self):
+            """
+            The content of the key
+
+            :rtype: str
+            """
+            return self._key
+
+        @property
+        def url(self):
+            """
+            Url where the key can be found
+
+            :rtype: str
+            """
+            return self._url
+
+        @property
+        def title(self):
+            """
+            The name of the key
+
+            :rtype: str
+            """
+            return self._title
+
+        @property
+        def created_at(self):
+            """
+            Creation date of the key.
+            :rtype: str
+            """
+            return self._created_at
+
+        @property
+        def read_only(self):
+            """
+            Is the key read only?
+            :rtype: bool
+            """
+            return self._read_only
 
 class GogsOrg(object):
     """
