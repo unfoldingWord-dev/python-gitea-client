@@ -191,6 +191,43 @@ class GogsApi(object):
         path = "/repos/{u}/{r}".format(u=username, r=repo_name)
         self._check_ok(self._delete(path, auth=auth))
 
+    def migrate_repo(self, auth, clone_addr, 
+                     uid, repo_name, auth_username=None, auth_password=None,
+                     mirror=False, private=False, description=None):
+        """
+        Migrate a repository from other Git hosting sources for the authenticated user.
+
+        :param str clone_addr: Remote Git address (HTTP/HTTPS URL or local path)
+        :param str auth_username: Authorization username
+        :param str auth_password: Authorization password
+        :param str uid: User ID who takes ownership of this repository
+        :param str repo_name: Repository name
+        :param bool mirror: Repository will be a mirror. Default is false
+        :param bool private: Repository will be private. Default is false
+        :param str descriptrion: Repository description
+        :return: a representation of the migrated repository
+        :rtype: GogsRepo
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        # "auth_username": auth_username,
+        # "auth_password": auth_password,
+
+        data = {
+            "clone_addr": clone_addr,
+            "uid": uid,
+            "repo_name": repo_name,
+            "auth_username": auth_username,
+            "auth_password": auth_password,
+            "mirror": mirror,
+            "private": private,
+            "description": description,
+        }
+        data = {k: v for (k, v) in data.items() if v is not None}
+        url = "/repos/migrate"
+        response = self._post(url, auth=auth, data=data)
+        return GogsRepo.from_json(self._check_ok(response).json())
+
     def create_user(self, auth, login_name, username, email, password, send_notify=False):
         """
         Creates a new user, and returns the created user.
