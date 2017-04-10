@@ -1,6 +1,6 @@
 pipeline:
   build:
-    image: python:${PYTHON_VERSION}:alpine
+    image: python:${PYTHON_VERSION}-alpine
     commands:
       - python tests/interface_test.py
 
