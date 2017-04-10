@@ -1,0 +1,5 @@
+pipeline:
+  build:
+    image: python:alpine
+    commands:
+      - python tests/interface_test.py
