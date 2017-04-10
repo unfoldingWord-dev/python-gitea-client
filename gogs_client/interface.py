@@ -200,7 +200,7 @@ class GogsApi(object):
         :param str clone_addr: Remote Git address (HTTP/HTTPS URL or local path)
         :param str auth_username: Authorization username
         :param str auth_password: Authorization password
-        :param str uid: User ID who takes ownership of this repository
+        :param int uid: User ID who takes ownership of this repository
         :param str repo_name: Repository name
         :param bool mirror: Repository will be a mirror. Default is false
         :param bool private: Repository will be private. Default is false
