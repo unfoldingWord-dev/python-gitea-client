@@ -1,5 +1,14 @@
 pipeline:
   build:
-    image: python:alpine
+    image: python:${PYTHON_VERSION}:alpine
     commands:
       - python tests/interface_test.py
+
+matrix:
+  PYTHON_VERSION:
+    - 2.7
+    - 3.3
+    - 3.4
+    - 3.5
+
+branches: [ master, feature/* ]
