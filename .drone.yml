@@ -6,6 +6,18 @@ pipeline:
       - pip install -r test_requirements.txt
       - python tests/interface_test.py
 
+
+  slack:
+    image: plugins/slack
+    webhook: https://hooks.slack.com/services/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
+    channel: python-gogs-client
+    template: >
+      {{#success build.status}}
+        build {{build.number}} succeeded. Good job.
+      {{else}}
+        build {{build.number}} failed. Fix me please.
+      {{/success}}
+
 matrix:
   PYTHON_VERSION:
     - 2.7
@@ -14,3 +26,4 @@ matrix:
     - 3.5
 
 branches: [ master, feature/* ]
+
