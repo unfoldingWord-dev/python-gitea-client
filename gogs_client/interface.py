@@ -178,6 +178,23 @@ class GogsApi(object):
         response = self._check_ok(self._get(path, auth=auth))
         return GogsRepo.from_json(response.json())
 
+    def get_user_repos(self, auth, username):
+        """
+        Returns the repositories  owned by
+        the user with username ``username``.
+
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
+        :return: a list of repositories
+        :rtype: List[GogsRepo]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/users/{u}/repos".format(u=username)
+        response = self._check_ok(self._get(path, auth=auth))
+        print response
+        return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
+
     def delete_repo(self, auth, username, repo_name):
         """
         Deletes the repository with name ``repo_name`` owned by the user with username ``username``.
