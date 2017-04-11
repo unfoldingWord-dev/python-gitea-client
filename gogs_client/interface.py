@@ -192,7 +192,6 @@ class GogsApi(object):
         """
         path = "/users/{u}/repos".format(u=username)
         response = self._check_ok(self._get(path, auth=auth))
-        print response
         return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
 
     def delete_repo(self, auth, username, repo_name):
