@@ -91,3 +91,5 @@ ENV/
 # IDE files
 .idea/
 
+# DRONE file
+.drone.yml
