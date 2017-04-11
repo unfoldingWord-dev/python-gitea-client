@@ -9,8 +9,8 @@ pipeline:
 
   slack:
     image: plugins/slack
-    webhook: https://hooks.slack.com/services/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
-    channel: python-gogs-client
+    webhook: ${WEBHOOK}
+    channel: ${CHANNEL}
 
 matrix:
   PYTHON_VERSION:
@@ -20,4 +20,3 @@ matrix:
     - 3.5
 
 branches: [ master, feature/* ]
-
