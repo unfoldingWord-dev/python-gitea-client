@@ -36,6 +36,47 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "pull": true
                   }
                 }"""
+        self.repos_list_json_str = """[{
+                "id": 27,
+                "owner": {
+                    "id": 1,
+                    "username": "unknwon",
+                    "full_name": "",
+                    "email": "u@gogs.io",
+                    "avatar_url": "/avatars/1"
+                  },
+                  "full_name": "unknwon/Hello-World",
+                  "private": false,
+                  "fork": false,
+                  "html_url": "http://localhost:3000/unknwon/Hello-World",
+                  "clone_url": "http://localhost:3000/unknwon/hello-world.git",
+                  "ssh_url": "jiahuachen@localhost:unknwon/hello-world.git",
+                  "permissions": {
+                    "admin": true,
+                    "push": true,
+                    "pull": true
+                  }
+                },{
+                "id": 28,
+                "owner": {
+                    "id": 1,
+                    "username": "unknwon",
+                    "full_name": "",
+                    "email": "u@gogs.io",
+                    "avatar_url": "/avatars/1"
+                  },
+                  "full_name": "unknwon/Hello-World-Again",
+                  "private": false,
+                  "fork": false,
+                  "html_url": "http://localhost:3000/unknwon/Hello-World-Again",
+                  "clone_url": "http://localhost:3000/unknwon/hello-world-again.git",
+                  "ssh_url": "jiahuachen@localhost:unknwon/hello-world-again.git",
+                  "permissions": {
+                    "admin": true,
+                    "push": true,
+                    "pull": true
+                  }
+                }]"""
         self.user_json_str = """{
                   "id": 1,
                   "username": "unknwon",
@@ -182,6 +223,15 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(first_call.request.url, self.path_with_token(uri1))
         last_call = responses.calls[1]
         self.assertEqual(last_call.request.url, self.path_with_token(uri2))
+
+    @responses.activate
+    def test_get_user_repos(self):
+        uri = self.path("/users/username/repos")
+        responses.add(responses.GET, uri, body=self.repos_list_json_str, status=200)
+        repos = self.client.get_user_repos(self.token, "username")
+        self.assertEqual(len(repos), 2)
+        self.assert_repos_equal(repos[0], self.expected_repo)
+
 
     @responses.activate
     def test_delete_repo1(self):
