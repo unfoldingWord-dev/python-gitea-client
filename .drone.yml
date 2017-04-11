@@ -11,12 +11,6 @@ pipeline:
     image: plugins/slack
     webhook: https://hooks.slack.com/services/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
     channel: python-gogs-client
-    template: >
-      {{#success build.status}}
-        build {{build.number}} succeeded. Good job.
-      {{else}}
-        build {{build.number}} failed. Fix me please.
-      {{/success}}
 
 matrix:
   PYTHON_VERSION:
