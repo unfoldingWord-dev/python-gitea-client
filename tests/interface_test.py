@@ -36,6 +36,47 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "pull": true
                   }
                 }"""
+        self.repos_list_json_str = """[{
+                "id": 27,
+                "owner": {
+                    "id": 1,
+                    "username": "unknwon",
+                    "full_name": "",
+                    "email": "u@gogs.io",
+                    "avatar_url": "/avatars/1"
+                  },
+                  "full_name": "unknwon/Hello-World",
+                  "private": false,
+                  "fork": false,
+                  "html_url": "http://localhost:3000/unknwon/Hello-World",
+                  "clone_url": "http://localhost:3000/unknwon/hello-world.git",
+                  "ssh_url": "jiahuachen@localhost:unknwon/hello-world.git",
+                  "permissions": {
+                    "admin": true,
+                    "push": true,
+                    "pull": true
+                  }
+                },{
+                "id": 28,
+                "owner": {
+                    "id": 1,
+                    "username": "unknwon",
+                    "full_name": "",
+                    "email": "u@gogs.io",
+                    "avatar_url": "/avatars/1"
+                  },
+                  "full_name": "unknwon/Hello-World-Again",
+                  "private": false,
+                  "fork": false,
+                  "html_url": "http://localhost:3000/unknwon/Hello-World-Again",
+                  "clone_url": "http://localhost:3000/unknwon/hello-world-again.git",
+                  "ssh_url": "jiahuachen@localhost:unknwon/hello-world-again.git",
+                  "permissions": {
+                    "admin": true,
+                    "push": true,
+                    "pull": true
+                  }
+                }]"""
         self.user_json_str = """{
                   "id": 1,
                   "username": "unknwon",
@@ -49,8 +90,98 @@ class GogsClientInterfaceTest(unittest.TestCase):
                 }"""
         self.username_password = gogs_client.UsernamePassword(
             "auth_username", "password")
+        self.hook_json_str = """{
+                "id": 4,
+                "type": "gogs",
+                "config": {
+                  "content_type": "json",
+                  "url": "http://test.io/hook"
+                },
+                "events": [
+                  "create",
+                  "push",
+                  "issues"
+                ],
+                "active": false,
+                "updated_at": "2017-03-31T12:42:58Z",
+                "created_at": "2017-03-31T12:42:58Z"
+              }"""
+        self.hooks_list_json_str = """[
+              {
+                "id": 4,
+                "type": "gogs",
+                "config": {
+                  "content_type": "json",
+                  "url": "http://test.io/hook"
+                },
+                "events": [
+                  "create",
+                  "push",
+                  "issues"
+                ],
+                "active": false,
+                "updated_at": "2017-03-31T12:42:58Z",
+                "created_at": "2017-03-31T12:42:58Z"
+              },
+              {
+                "id": 3,
+                "type": "gogs",
+                "config": {
+                  "content_type": "json",
+                  "url": "http://192.168.201.1:8080/hook22/"
+                },
+                "events": [
+                  "issue_comment"
+                ],
+                "active": true,
+                "updated_at": "2017-03-31T12:47:56Z",
+                "created_at": "2017-03-31T12:42:54Z"
+              }
+            ]"""
+        self.org_json_str = """{
+              "id": 7,
+              "username": "gogs2",
+              "full_name": "Gogs2",
+              "avatar_url": "/avatars/7",
+              "description": "Gogs is a painless self-hosted Git Service.",
+              "website": "https://gogs.io",
+              "location": "USA"
+            }"""
+        self.team_json_str = """{
+              "id": 12,
+              "name": "new-team",
+              "description": "A new team created by API",
+              "permission": "write"
+            }"""
+        self.deploy_key_json_str = """{
+              "id": 1,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            }"""
+        self.deploy_key_json_list = """[{
+              "id": 1,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            },{
+              "id": 2,
+              "key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUbmwBOG5vI8qNCztby5LDc9ozwTuwsqf+1fpuHjT9iQ2Lu9nlKHQJcPSgdrYAcc+88K6o74ayhTAjfajKxkIHnbzZFjidoVZSQDhX5qvl93jvY/Uz390qky0sweW+fspm8pRJL+ofE3QEN5AXAuycq1tgsRT32XC+Ta82Xyv8b3xW+pWbsZzYCzUsZXDe/xWxg1rndXh2BIrmcYf9BMiv9ZJIojJXfuLCeRXl550tDzaMFC0rQ/T5pZjs/lQemtg92MnxnEDi5nhuvDwM4Q8eqCTOXc4BCE7iyIHv+B7rx+0x99ytMh5BSIIGyWTfgTot/AjGVm5aRKJSRFgPBm9N comment with whitespace",
+              "url": "http://localhost:3000/api/v1/repos/unknwon/project_x/keys/1",
+              "title": "local",
+              "created_at": "2015-11-18T15:05:43-05:00",
+              "read_only": true
+            }]"""
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
+        self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
+        self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
+        self.expected_team = gogs_client.GogsOrg.Team.from_json(json.loads(self.team_json_str))
+        self.expected_key = gogs_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
         self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
@@ -92,6 +223,15 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(first_call.request.url, self.path_with_token(uri1))
         last_call = responses.calls[1]
         self.assertEqual(last_call.request.url, self.path_with_token(uri2))
+
+    @responses.activate
+    def test_get_user_repos(self):
+        uri = self.path("/users/username/repos")
+        responses.add(responses.GET, uri, body=self.repos_list_json_str, status=200)
+        repos = self.client.get_user_repos(self.token, "username")
+        self.assertEqual(len(repos), 2)
+        self.assert_repos_equal(repos[0], self.expected_repo)
+
 
     @responses.activate
     def test_delete_repo1(self):
@@ -184,7 +324,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             .build()
 
         def callback(request):
-            data = self.data_of_query(request.body)
+            data = json.loads(request.body.decode('utf8'))
             self.assertEqual(data["login_name"], "loginname")
             self.assertEqual(data["full_name"], "Example User")
             self.assertEqual(data["email"], "user@example.com")
@@ -267,6 +407,149 @@ class GogsClientInterfaceTest(unittest.TestCase):
         token = self.client.ensure_token(self.username_password, self.token.name)
         self.assert_tokens_equals(token, self.token)
 
+    @responses.activate
+    def test_create_hook1(self):
+        uri = self.path("/repos/username/repo1/hooks")
+        responses.add(responses.POST, uri, body=self.hook_json_str)
+        hook = self.client.create_hook(self.token, 
+            repo_name="repo1", 
+            hook_type="gogs", 
+            config={ 
+                "content_type": "json2",
+                "url": "http://test.io/hook"
+                }, 
+            events=["create", "push", "issues"], 
+            active=False,
+            organization="username")
+        self.assert_hooks_equals(hook, self.expected_hook)
+        self.assertEqual(len(responses.calls), 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
+
+    @responses.activate
+    def test_update_hook1(self):
+        update = gogs_client.GogsHookUpdate.Builder()\
+            .set_events(["issues_comments"])\
+            .set_config({"url": "http://newurl.com/hook"})\
+            .set_active(True)\
+            .build()
+
+        def callback(request):
+            data = json.loads(request.body.decode('utf8'))
+            self.assertEqual(data["config"]["url"], "http://newurl.com/hook")
+            self.assertEqual(data["events"], ['issues_comments'])
+            self.assertEqual(data["active"], True)
+            return 200, {}, self.hook_json_str
+        uri = self.path("/repos/username/repo1/hooks/4")
+        responses.add_callback(responses.PATCH, uri, callback=callback)
+        hook = self.client.update_hook(self.token, "repo1", 4, update, organization="username")
+        self.assert_hooks_equals(hook, self.expected_hook)
+
+    @responses.activate
+    def test_list_hooks(self):
+        uri = self.path("/repos/username/repo1/hooks")
+        responses.add(responses.GET, uri, body=self.hooks_list_json_str, status=200)
+        hooks = self.client.get_repo_hooks(self.token, "username", "repo1")
+        self.assertEqual(len(hooks), 2)
+        self.assert_hooks_equals(hooks[0], self.expected_hook)
+
+    @responses.activate
+    def test_delete_hook(self):
+        uri = self.path("/repos/username/repo1/hooks/4")
+        responses.add(responses.DELETE, uri, status=204)
+        hook = self.client.delete_hook(self.token, "username", "repo1", 4)
+        self.assertEqual(hook, None)
+
+    @responses.activate
+    def test_create_organization(self):
+        uri =  self.path("/admin/users/username/orgs")
+        responses.add(responses.POST, uri, body=self.org_json_str)
+        org = self.client.create_organization(self.token, 
+            username="username", 
+            org_name="gogs2", 
+            full_name="Gogs2",
+            description="Gogs is a painless self-hosted Git Service.",
+            website="https://gogs.io",
+            location="USA")
+        self.assert_org_equals(org, self.expected_org)
+        self.assertEqual(len(responses.calls), 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
+
+    @responses.activate
+    def test_create_organization_team(self):
+        uri =  self.path("/admin/orgs/username/teams")
+        responses.add(responses.POST, uri, body=self.team_json_str)
+        team = self.client.create_organization_team(self.token, 
+            org_name="username", 
+            name="new-team", 
+            description="A new team created by API",
+            permission="write")
+        self.assert_team_equals(team, self.expected_team)
+        self.assertEqual(len(responses.calls), 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
+
+    @responses.activate
+    def test_add_team_membership(self):
+        uri = self.path("/admin/teams/team/members/username")
+        responses.add(responses.PUT, uri, status=204)
+        resp = self.client.add_team_membership(self.token, "team", "username")
+        self.assertEqual(resp, None)
+
+    @responses.activate
+    def test_remove_team_membership(self):
+        uri = self.path("/admin/teams/team/members/username")
+        responses.add(responses.DELETE, uri, status=204)
+        resp = self.client.remove_team_membership(self.token, "team", "username")
+        self.assertEqual(resp, None)
+
+    @responses.activate
+    def test_add_repo_to_team(self):
+        uri = self.path("/admin/teams/test_team/repos/repo_name")
+        responses.add(responses.PUT, uri, status=204)
+        resp = self.client.add_repo_to_team(self.token, "test_team", "repo_name")
+        self.assertEqual(resp, None)
+
+    @responses.activate
+    def test_remove_repo_from_team(self):
+        uri = self.path("/admin/teams/test_team/repos/repo_name")
+        responses.add(responses.DELETE, uri, status=204)
+        resp = self.client.remove_repo_from_team(self.token, "test_team", "repo_name")
+        self.assertEqual(resp, None)
+
+    @responses.activate
+    def test_list_deploy_keys(self):
+        uri = self.path("/repos/username/repo1/keys")
+        responses.add(responses.GET, uri, body=self.deploy_key_json_list, status=200)
+        keys = self.client.list_deploy_keys(self.token, "username", "repo1")
+        self.assertEqual(len(keys), 2)
+        self.assert_keys_equals(keys[0], self.expected_key)
+
+    @responses.activate
+    def test_delete_deploy_keys(self):
+        uri = self.path("/repos/username/repo1/keys/1")
+        responses.add(responses.DELETE, uri, status=204)
+        key = self.client.delete_deploy_key(self.token, "username", "repo1", 1)
+        self.assertEqual(key.status_code, 204)
+
+    @responses.activate
+    def test_get_deploy_key(self):
+        uri = self.path("/repos/username/repo1/keys/1")
+        responses.add(responses.GET, uri, body=self.deploy_key_json_str)
+        key = self.client.get_deploy_key(self.token, "username", "repo1", 1)
+        self.assert_keys_equals(key, self.expected_key)
+
+    @responses.activate
+    def test_add_deploy_key(self):
+        uri = self.path("/repos/username/repo1/keys")
+        responses.add(responses.POST, uri, body=self.deploy_key_json_str)
+        key_title = "My key title"
+        key_content = "My key content"
+        key = self.client.add_deploy_key(self.token, "username", "repo1", key_title, key_content)
+        self.assert_keys_equals(key, self.expected_key)
+
+
     # helper methods
 
     @staticmethod
@@ -310,6 +593,35 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(token.name, expected.name)
         self.assertEqual(token.token, expected.token)
 
+    def assert_hooks_equals(self, hook, expected):
+        self.assertEqual(hook.hook_id, expected.hook_id)
+        self.assertEqual(hook.hook_type, expected.hook_type)
+        self.assertEqual(hook.events, expected.events)
+        self.assertEqual(hook.config, expected.config)
+        self.assertEqual(hook.active, expected.active)
+
+    def assert_org_equals(self, org, expected):
+        self.assertEqual(org.org_id, expected.org_id)
+        self.assertEqual(org.username, expected.username)
+        self.assertEqual(org.full_name, expected.full_name)
+        self.assertEqual(org.avatar_url, expected.avatar_url)
+        self.assertEqual(org.description, expected.description)
+        self.assertEqual(org.website, expected.website)
+        self.assertEqual(org.location, expected.location)
+
+    def assert_team_equals(self, team, expected):
+        self.assertEqual(team.team_id, expected.team_id)
+        self.assertEqual(team.name, expected.name)
+        self.assertEqual(team.description, expected.description)
+        self.assertEqual(team.permission, expected.permission)
+
+    def assert_keys_equals(self, key, expected):
+        self.assertEqual(key.key_id, expected.key_id)
+        self.assertEqual(key.title, expected.title)
+        self.assertEqual(key.url, expected.url)
+        self.assertEqual(key.key, expected.key)
+        self.assertEqual(key.read_only, expected.read_only)
+        self.assertEqual(key.created_at, expected.created_at)
 
 if __name__ == "__main__":
     unittest.main()

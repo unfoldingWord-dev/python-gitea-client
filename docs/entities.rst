@@ -17,3 +17,12 @@ This pages documents classes provided by ``gogs_client`` module that represent e
 
 .. autoclass:: gogs_client.entities::GogsRepo.Permissions()
     :members:
+
+.. autoclass:: gogs_client.entities::GogsRepo.Hook()
+    :members:
+
+.. autoclass:: gogs_client.entities::GogsOrg()
+    :members:
+
+.. autoclass:: gogs_client.entities::GogsOrg.Team()
+    :members:
