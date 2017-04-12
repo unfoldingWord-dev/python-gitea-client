@@ -291,16 +291,16 @@ class GogsRepo(object):
         @property
         def events(self):
             """
-            The events that fires the hook
+            The events that fire the hook
 
-            :rtype: list of strs
+            :rtype: List[str]
             """
             return self._events
 
         @property
         def active(self):
             """
-            State of the hook
+            Whether the hook is active
 
             :rtype: bool
             """
@@ -397,7 +397,7 @@ class GogsRepo(object):
         @property
         def read_only(self):
             """
-            Is the key read only?
+            Whether key is read-only.
             :rtype: bool
             """
             return self._read_only
@@ -454,7 +454,7 @@ class GogsOrg(object):
         """
         Organization's username
 
-        :rtype: int
+        :rtype: str
         """
         return self._username
 
@@ -463,7 +463,7 @@ class GogsOrg(object):
         """
         Organization's full name
 
-        :rtype: int
+        :rtype: str
         """
         return self._full_name 
 
@@ -544,7 +544,7 @@ class GogsOrg(object):
             """
             Team name
 
-            :rtype: int
+            :rtype: str
             """
             return self._name
 
@@ -553,7 +553,7 @@ class GogsOrg(object):
             """
             Description to the team
 
-            :rtype: int
+            :rtype: str
             """
             return self._description
 

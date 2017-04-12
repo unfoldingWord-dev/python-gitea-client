@@ -420,7 +420,6 @@ class GogsApi(object):
         """
         path = "/repos/{u}/{r}/hooks/{i}".format(u=username, r=repo_name, i=hook_id)
         response = self._check_ok(self._delete(path, auth=auth))
-        return response
 
     def create_organization(self, auth, username, org_name, full_name=None, avatar_url=None, description=None, website=None, location=None):
         """
@@ -457,7 +456,7 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str org_name: [Required] Organization user name
-        :param str team_name: Full name of the team
+        :param str name: Full name of the team
         :param str description: Description to the team
         :param str permission: Team permission, can be read, write or admin, default is read
         :return: a representation of the created team
@@ -484,14 +483,11 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str team_id: [Required] Id of the team
         :param str username: Username of the user to be added to team
-        :return: status code of the request
-        :rtype: str
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
-        response = self._put(url, auth=auth)
-        return self._check_ok(response)
+        response = self._check_ok(self._put(url, auth=auth))
 
     def remove_team_membership(self, auth, team_id, username):
         """
@@ -500,14 +496,11 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str team_id: [Required] Id of the team
         :param str username: Username of the user to be removed from the team
-        :return: status code of the request
-        :rtype: str
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
-        response = self._delete(url, auth=auth)
-        return self._check_ok(response)
+        response = self._check_ok(self._delete(url, auth=auth))
 
     def add_repo_to_team(self, auth, team_id, repo_name):
         """
@@ -516,15 +509,11 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str team_id: [Required] Id of the team
         :param str repo_name: Name of the repo to be added to the team
-        :return: status code of the request
-        :rtype: str
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
-        response = self._put(url, auth=auth)
-        return self._check_ok(response)
-
+        response = self._check_ok(self._put(url, auth=auth))
 
     def remove_repo_from_team(self, auth, team_id, repo_name):
         """
@@ -533,14 +522,11 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str team_id: [Required] Id of the team
         :param str repo_name: Name of the repo to be removed from the team
-        :return: status code of the request
-        :rtype: str
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
-        response = self._delete(url, auth=auth)
-        return self._check_ok(response)
+        response = self._check_ok(self._delete(url, auth=auth))
 
     def list_deploy_keys(self, auth, username, repo_name):
         """

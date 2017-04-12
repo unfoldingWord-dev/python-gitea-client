@@ -458,7 +458,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         uri = self.path("/repos/username/repo1/hooks/4")
         responses.add(responses.DELETE, uri, status=204)
         hook = self.client.delete_hook(self.token, "username", "repo1", 4)
-        self.assertEqual(hook.status_code, 204)
+        self.assertEqual(hook, None)
 
     @responses.activate
     def test_create_organization(self):
@@ -495,28 +495,28 @@ class GogsClientInterfaceTest(unittest.TestCase):
         uri = self.path("/admin/teams/team/members/username")
         responses.add(responses.PUT, uri, status=204)
         resp = self.client.add_team_membership(self.token, "team", "username")
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp, None)
 
     @responses.activate
     def test_remove_team_membership(self):
         uri = self.path("/admin/teams/team/members/username")
         responses.add(responses.DELETE, uri, status=204)
         resp = self.client.remove_team_membership(self.token, "team", "username")
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp, None)
 
     @responses.activate
     def test_add_repo_to_team(self):
         uri = self.path("/admin/teams/test_team/repos/repo_name")
         responses.add(responses.PUT, uri, status=204)
         resp = self.client.add_repo_to_team(self.token, "test_team", "repo_name")
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp, None)
 
     @responses.activate
     def test_remove_repo_from_team(self):
         uri = self.path("/admin/teams/test_team/repos/repo_name")
         responses.add(responses.DELETE, uri, status=204)
         resp = self.client.remove_repo_from_team(self.token, "test_team", "repo_name")
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp, None)
 
     @responses.activate
     def test_list_deploy_keys(self):
