@@ -9,6 +9,7 @@ class Authentication(object):
     An "abstract" parent class. Represents a
     means of authenticating oneself to Gogs
     """
+
     def update_kwargs(self, kwargs):
         """
         Updates kwargs to include this object's authentication information
@@ -23,6 +24,7 @@ class Token(Authentication):
     """
     An immutable representation of a Gogs authentication token
     """
+
     def __init__(self, token, name=None):
         """
         :param str token: contents of Gogs authentication token

@@ -1,8 +1,8 @@
 import requests
 
 from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
-from gogs_client.entities import GogsUser, GogsRepo, GogsOrg
 from gogs_client.auth import Token
+from gogs_client.entities import GogsUser, GogsRepo, GogsOrg, GogsTeam
 
 
 class GogsApi(object):
@@ -14,7 +14,7 @@ class GogsApi(object):
         """
         :param str base_url: the URL of the Gogs server to communicate with. Should be given
                              with the https protocol
-        :param str session: a requests session instance
+        :param requests.Session session: a ``requests`` session instance
         """
         api_base = append_url(base_url, "/api/v1/")
         self._requestor = RelativeHttpRequestor(api_base, session=session)
@@ -106,7 +106,7 @@ class GogsApi(object):
         if username is None:
             username = self.authenticated_user(auth).username
         tokens = [token for token in self.get_tokens(auth, username) if token.name == name]
-        if tokens:
+        if len(tokens) > 0:
             return tokens[0]
         return self.create_token(auth, name, username)
 
@@ -207,20 +207,19 @@ class GogsApi(object):
         path = "/repos/{u}/{r}".format(u=username, r=repo_name)
         self._check_ok(self._delete(path, auth=auth))
 
-    def migrate_repo(self, auth, clone_addr, 
+    def migrate_repo(self, auth, clone_addr,
                      uid, repo_name, auth_username=None, auth_password=None,
                      mirror=False, private=False, description=None):
         """
-        Migrate a repository from other Git hosting sources for the authenticated user.
+        Migrate a repository from another Git hosting source for the authenticated user.
 
+        :param auth.Authentication auth: authentication object
         :param str clone_addr: Remote Git address (HTTP/HTTPS URL or local path)
-        :param str auth_username: Authorization username
-        :param str auth_password: Authorization password
-        :param int uid: User ID who takes ownership of this repository
+        :param int uid: user ID of repository owner
         :param str repo_name: Repository name
         :param bool mirror: Repository will be a mirror. Default is false
         :param bool private: Repository will be private. Default is false
-        :param str descriptrion: Repository description
+        :param str description: Repository description
         :return: a representation of the migrated repository
         :rtype: GogsRepo
         :raises NetworkFailure: if there is an error communicating with the server
@@ -233,8 +232,6 @@ class GogsApi(object):
             "clone_addr": clone_addr,
             "uid": uid,
             "repo_name": repo_name,
-            "auth_username": auth_username,
-            "auth_password": auth_password,
             "mirror": mirror,
             "private": private,
             "description": description,
@@ -358,25 +355,27 @@ class GogsApi(object):
         """
         path = "/repos/{u}/{r}/hooks".format(u=username, r=repo_name)
         response = self._check_ok(self._get(path, auth=auth))
-        hooks = [GogsRepo.Hook.from_json(hook) for hook in response.json()]
-        return hooks
+        return [GogsRepo.Hook.from_json(hook) for hook in response.json()]
 
-    def create_hook(self, auth, repo_name, hook_type, config, events=["push"], organization=None, active=False):
+    def create_hook(self, auth, repo_name, hook_type, config, events=None, organization=None, active=False):
         """
         Creates a new hook, and returns the created hook.
 
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str repo_name: the name of the repo for which we create the hook
         :param str hook_type: The type of webhook, either "gogs" or "slack"
-        :param dict config: Key/value pairs to provide settings for this hook ("url", "content_type", "secret")
+        :param dict config: Settings for this hook (possible keys are
+                            ``"url"``, ``"content_type"``, ``"secret"``)
         :param list events: Determines what events the hook is triggered for. Default: ["push"]
-        :param str organization: (Optional) Organization of the repo
+        :param str organization: Organization of the repo
         :param bool active: Determines whether the hook is actually triggered on pushes. Default is false
         :return: a representation of the created hook
         :rtype: GogsRepo.Hook
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
+        if events is None:
+            events = ["push"]  # default value is mutable, so assign inside body
 
         data = {
             "type": hook_type,
@@ -385,24 +384,30 @@ class GogsApi(object):
             "active": active
         }
 
-        url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization else "/repos/{r}/hooks".format(r=repo_name)
+        url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization is not None \
+            else "/repos/{r}/hooks".format(r=repo_name)
         response = self._post(url, auth=auth, data=data)
         self._check_ok(response)
         return GogsRepo.Hook.from_json(response.json())
 
     def update_hook(self, auth, repo_name, hook_id, update, organization=None):
         """
-        Updates hook  with id ``hook_id`` according to ``update``.
+        Updates hook with id ``hook_id`` according to ``update``.
 
-        :param auth.Authentication auth: authentication object, must be admin-level
+        :param auth.Authentication auth: authentication object
         :param str repo_name: repo of the hook to update
+        :param int hook_id: id of the hook to update
         :param GogsHookUpdate update: a ``GogsHookUpdate`` object describing the requested update
+        :param str organization: name of associated organization, if applicable
         :return: the updated hook
         :rtype: GogsRepo.Hook
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        path = "/repos/{o}/{r}/hooks/{i}".format(o=organization, r=repo_name, i=hook_id) if organization else "/repos/{r}/hooks/{i}".format(r=repo_name, i=hook_id)
+        if organization is not None:
+            path = "/repos/{o}/{r}/hooks/{i}".format(o=organization, r=repo_name, i=hook_id)
+        else:
+            path = "/repos/{r}/hooks/{i}".format(r=repo_name, i=hook_id)
         response = self._check_ok(self._patch(path, auth=auth, data=update.as_dict()))
         return GogsRepo.Hook.from_json(response.json())
 
@@ -419,16 +424,18 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/hooks/{i}".format(u=username, r=repo_name, i=hook_id)
-        response = self._check_ok(self._delete(path, auth=auth))
+        self._check_ok(self._delete(path, auth=auth))
 
-    def create_organization(self, auth, username, org_name, full_name=None, avatar_url=None, description=None, website=None, location=None):
+    def create_organization(self, auth, owner_name, org_name, full_name=None, description=None,
+                            website=None, location=None):
         """
-        Creates a new organization, and returns the created one.
+        Creates a new organization, and returns the created organization.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str username: [Required] Organization user name
+        :param str owner_name: Username of organization owner
+        :param str org_name: Organization name
         :param str full_name: Full name of organization 
-        :param str description: Description to the organization
+        :param str description: Description of the organization
         :param str website: Official website
         :param str location: Organization location
         :return: a representation of the created organization
@@ -436,16 +443,15 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-
         data = {
-          "username": org_name,
-          "full_name": full_name,
-          "description": description,
-          "website": website,
-          "location": location
+            "username": org_name,
+            "full_name": full_name,
+            "description": description,
+            "website": website,
+            "location": location
         }
 
-        url = "/admin/users/{u}/orgs".format(u=username) 
+        url = "/admin/users/{u}/orgs".format(u=owner_name)
         response = self._post(url, auth=auth, data=data)
         self._check_ok(response)
         return GogsOrg.from_json(response.json())
@@ -455,98 +461,99 @@ class GogsApi(object):
         Creates a new team of the organization.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str org_name: [Required] Organization user name
+        :param str org_name: Organization user name
         :param str name: Full name of the team
-        :param str description: Description to the team
+        :param str description: Description of the team
         :param str permission: Team permission, can be read, write or admin, default is read
         :return: a representation of the created team
-        :rtype: GogsOrg.Team
+        :rtype: GogsTeam
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-
         data = {
-          "name": name,
-          "description": description,
-          "permission": permission
+            "name": name,
+            "description": description,
+            "permission": permission
         }
 
-        url = "/admin/orgs/{o}/teams".format(o=org_name) 
+        url = "/admin/orgs/{o}/teams".format(o=org_name)
         response = self._post(url, auth=auth, data=data)
         self._check_ok(response)
-        return GogsOrg.Team.from_json(response.json())
+        return GogsTeam.from_json(response.json())
 
     def add_team_membership(self, auth, team_id, username):
         """
         Add user to team.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str team_id: [Required] Id of the team
+        :param str team_id: Team's id
         :param str username: Username of the user to be added to team
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
-        response = self._check_ok(self._put(url, auth=auth))
+        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username)
+        self._check_ok(self._put(url, auth=auth))
 
     def remove_team_membership(self, auth, team_id, username):
         """
         Remove user from team.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str team_id: [Required] Id of the team
+        :param str team_id: Team's id
         :param str username: Username of the user to be removed from the team
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username) 
-        response = self._check_ok(self._delete(url, auth=auth))
+        url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username)
+        self._check_ok(self._delete(url, auth=auth))
 
     def add_repo_to_team(self, auth, team_id, repo_name):
         """
         Add or update repo from team.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str team_id: [Required] Id of the team
+        :param str team_id: Team's id
         :param str repo_name: Name of the repo to be added to the team
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
-        response = self._check_ok(self._put(url, auth=auth))
+        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name)
+        self._check_ok(self._put(url, auth=auth))
 
     def remove_repo_from_team(self, auth, team_id, repo_name):
         """
         Remove repo from team.
 
         :param auth.Authentication auth: authentication object, must be admin-level
-        :param str team_id: [Required] Id of the team
+        :param str team_id: Team's id
         :param str repo_name: Name of the repo to be removed from the team
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name) 
-        response = self._check_ok(self._delete(url, auth=auth))
+        url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name)
+        self._check_ok(self._delete(url, auth=auth))
 
     def list_deploy_keys(self, auth, username, repo_name):
         """
-        List deploy keys.
+        List deploy keys for the specified repo.
 
-        :param str username: username or organization
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
         :param str repo_name: the name of the repo
         :return: a list of deploy keys for the repo
         :rtype: List[GogsRepo.DeployKey]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        response = self._check_ok(self._get("/repos/{u}/{r}/keys".format(u=username, r=repo_name),auth=auth))
+        response = self._check_ok(self._get("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth))
         return [GogsRepo.DeployKey.from_json(key_json) for key_json in response.json()]
 
     def get_deploy_key(self, auth, username, repo_name, key_id):
         """
-        Get deploy key for specific repo.
+        Get a deploy key for the specified repo.
 
-        :param str username: username or organization
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
         :param str repo_name: the name of the repo
         :param int key_id: the id of the key
         :return: the deploy key
@@ -554,45 +561,46 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-
-        response = self._check_ok(self._get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
+        response = self._check_ok(
+            self._get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
         return GogsRepo.DeployKey.from_json(response.json())
 
-    def add_deploy_key(self, auth, username, repo_name, title, key):
+    def add_deploy_key(self, auth, username, repo_name, title, key_content):
         """
-        Get deploy key for specific repo.
+        Add a deploy key to the specified repo.
 
-        :param str username: username or organization
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
         :param str repo_name: the name of the repo
-        :param int key_id: the id of the key
-        :return: the deploy key
+        :param str title: title of the key to add
+        :param str key_content: content of the key to add
+        :return: a representation of the added deploy key
         :rtype: GogsRepo.DeployKey
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         data = {
             "title": title,
-            "key": key
+            "key": key_content
         }
-        response = self._check_ok(self._post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data))
+        response = self._check_ok(
+            self._post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data))
         return GogsRepo.DeployKey.from_json(response.json())
 
     def delete_deploy_key(self, auth, username, repo_name, key_id):
         """
-        Remove deploy key for specific repo.
+        Remove deploy key for the specified repo.
 
-        :param str username: username or organization
+        :param auth.Authentication auth: authentication object
+        :param str username: username of owner of repository
         :param str repo_name: the name of the repo
         :param int key_id: the id of the key
-        :return: the deploy key
-        :rtype: GogsRepo.DeployKey
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-
-        response = self._check_ok(self._delete("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
-        return self._check_ok(response)
-
+        response = self._check_ok(
+            self._delete("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
+        self._check_ok(response)
 
     # Helper methods
 
@@ -653,7 +661,7 @@ class GogsApi(object):
         message = "Status code: {}-{}, url: {}".format(response.status_code, response.reason, response.url)
         try:
             message += ", message:{}".format(response.json()["message"])
-        except Exception:
+        except (ValueError, KeyError):
             pass
         raise ApiFailure(message, response.status_code)
 
@@ -662,6 +670,7 @@ class ApiFailure(Exception):
     """
     Raised to signal a failed request
     """
+
     def __init__(self, message, status_code):
         self._message = message
         self._status_code = status_code
@@ -693,6 +702,7 @@ class NetworkFailure(Exception):
     """
     Raised to signal a network-level failure
     """
+
     def __init__(self, cause=None):
         self._cause = cause
 

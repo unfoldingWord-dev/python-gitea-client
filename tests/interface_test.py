@@ -10,7 +10,6 @@ import gogs_client._implementation.http_utils as http_utils
 
 
 class GogsClientInterfaceTest(unittest.TestCase):
-
     def setUp(self):
         self.api_endpoint = "https://www.example.com/api/v1/"
         self.base_url = "https://www.example.com/"
@@ -180,7 +179,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
         self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
         self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
-        self.expected_team = gogs_client.GogsOrg.Team.from_json(json.loads(self.team_json_str))
+        self.expected_team = gogs_client.GogsTeam.from_json(json.loads(self.team_json_str))
         self.expected_key = gogs_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
         self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
 
@@ -231,7 +230,6 @@ class GogsClientInterfaceTest(unittest.TestCase):
         repos = self.client.get_user_repos(self.token, "username")
         self.assertEqual(len(repos), 2)
         self.assert_repos_equal(repos[0], self.expected_repo)
-
 
     @responses.activate
     def test_delete_repo1(self):
@@ -287,6 +285,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             self.assertEqual(data["q"], "keyword")
             self.assertEqual(int(data["limit"]), 4)
             return 200, {}, "{\"data\": [%s], \"ok\": true}" % self.user_json_str
+
         responses.add_callback(responses.GET, uri, callback=callback)
         users = self.client.search_users("keyword", limit=4)
         self.assertEqual(len(users), 1)
@@ -314,13 +313,13 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_user1(self):
-        update = gogs_client.GogsUserUpdate.Builder("loginname", "user@example.com")\
-            .set_full_name("Example User")\
-            .set_password("Password")\
-            .set_website("mywebsite.net")\
-            .set_active(True)\
-            .set_admin(False)\
-            .set_allow_git_hook(False)\
+        update = gogs_client.GogsUserUpdate.Builder("loginname", "user@example.com") \
+            .set_full_name("Example User") \
+            .set_password("Password") \
+            .set_website("mywebsite.net") \
+            .set_active(True) \
+            .set_admin(False) \
+            .set_allow_git_hook(False) \
             .build()
 
         def callback(request):
@@ -337,6 +336,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             self.assertNotIn("location", data)
             self.assertNotIn("allow_import_local", data)
             return 200, {}, self.user_json_str
+
         uri = self.path("/admin/users/username")
         responses.add_callback(responses.PATCH, uri, callback=callback)
         user = self.client.update_user(self.token, "username", update)
@@ -364,6 +364,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         uri = self.path("/user")
         valid_token = gogs_client.Token("a_valid_token")
         invalid_token = gogs_client.Token("an_invalid_token")
+
         def callback(request):
             if request.url == self.path_with_token(uri, valid_token):
                 return 200, {}, self.user_json_str
@@ -371,6 +372,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                 return 401, {}, ""
             else:
                 self.fail("Unexpected URL: {}".format(request.url))
+
         responses.add_callback(responses.GET, uri, callback=callback)
         self.assertTrue(self.client.valid_authentication(valid_token))
         self.assertFalse(self.client.valid_authentication(invalid_token))
@@ -387,7 +389,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         uri = self.path("/users/{}/tokens".format(self.username_password.username))
         responses.add(responses.GET, uri, body="[]", status=200)
         responses.add(responses.POST, uri, body=self.token_json_str, status=200)
-        responses.add(responses.GET, uri, body="["+self.token_json_str+"]", status=200)
+        responses.add(responses.GET, uri, body="[" + self.token_json_str + "]", status=200)
         token = self.client.ensure_token(self.username_password, self.token.name, self.username_password.username)
         self.assert_tokens_equals(token, self.token)
         token = self.client.ensure_token(self.username_password, self.token.name, self.username_password.username)
@@ -411,16 +413,16 @@ class GogsClientInterfaceTest(unittest.TestCase):
     def test_create_hook1(self):
         uri = self.path("/repos/username/repo1/hooks")
         responses.add(responses.POST, uri, body=self.hook_json_str)
-        hook = self.client.create_hook(self.token, 
-            repo_name="repo1", 
-            hook_type="gogs", 
-            config={ 
-                "content_type": "json2",
-                "url": "http://test.io/hook"
-                }, 
-            events=["create", "push", "issues"], 
-            active=False,
-            organization="username")
+        hook = self.client.create_hook(self.token,
+                                       repo_name="repo1",
+                                       hook_type="gogs",
+                                       config={
+                                           "content_type": "json2",
+                                           "url": "http://test.io/hook"
+                                       },
+                                       events=["create", "push", "issues"],
+                                       active=False,
+                                       organization="username")
         self.assert_hooks_equals(hook, self.expected_hook)
         self.assertEqual(len(responses.calls), 1)
         call = responses.calls[0]
@@ -428,10 +430,10 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_hook1(self):
-        update = gogs_client.GogsHookUpdate.Builder()\
-            .set_events(["issues_comments"])\
-            .set_config({"url": "http://newurl.com/hook"})\
-            .set_active(True)\
+        update = gogs_client.GogsHookUpdate.Builder() \
+            .set_events(["issues_comments"]) \
+            .set_config({"url": "http://newurl.com/hook"}) \
+            .set_active(True) \
             .build()
 
         def callback(request):
@@ -440,6 +442,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             self.assertEqual(data["events"], ['issues_comments'])
             self.assertEqual(data["active"], True)
             return 200, {}, self.hook_json_str
+
         uri = self.path("/repos/username/repo1/hooks/4")
         responses.add_callback(responses.PATCH, uri, callback=callback)
         hook = self.client.update_hook(self.token, "repo1", 4, update, organization="username")
@@ -462,15 +465,15 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_create_organization(self):
-        uri =  self.path("/admin/users/username/orgs")
+        uri = self.path("/admin/users/username/orgs")
         responses.add(responses.POST, uri, body=self.org_json_str)
-        org = self.client.create_organization(self.token, 
-            username="username", 
-            org_name="gogs2", 
-            full_name="Gogs2",
-            description="Gogs is a painless self-hosted Git Service.",
-            website="https://gogs.io",
-            location="USA")
+        org = self.client.create_organization(self.token,
+                                              owner_name="username",
+                                              org_name="gogs2",
+                                              full_name="Gogs2",
+                                              description="Gogs is a painless self-hosted Git Service.",
+                                              website="https://gogs.io",
+                                              location="USA")
         self.assert_org_equals(org, self.expected_org)
         self.assertEqual(len(responses.calls), 1)
         call = responses.calls[0]
@@ -478,13 +481,13 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_create_organization_team(self):
-        uri =  self.path("/admin/orgs/username/teams")
+        uri = self.path("/admin/orgs/username/teams")
         responses.add(responses.POST, uri, body=self.team_json_str)
-        team = self.client.create_organization_team(self.token, 
-            org_name="username", 
-            name="new-team", 
-            description="A new team created by API",
-            permission="write")
+        team = self.client.create_organization_team(self.token,
+                                                    org_name="username",
+                                                    name="new-team",
+                                                    description="A new team created by API",
+                                                    permission="write")
         self.assert_team_equals(team, self.expected_team)
         self.assertEqual(len(responses.calls), 1)
         call = responses.calls[0]
@@ -527,11 +530,12 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assert_keys_equals(keys[0], self.expected_key)
 
     @responses.activate
-    def test_delete_deploy_keys(self):
+    def test_delete_deploy_key(self):
         uri = self.path("/repos/username/repo1/keys/1")
         responses.add(responses.DELETE, uri, status=204)
-        key = self.client.delete_deploy_key(self.token, "username", "repo1", 1)
-        self.assertEqual(key.status_code, 204)
+        self.client.delete_deploy_key(self.token, "username", "repo1", 1)
+        call = responses.calls[0]
+        self.assertEqual(call.request.url, self.path_with_token(uri))
 
     @responses.activate
     def test_get_deploy_key(self):
@@ -548,7 +552,6 @@ class GogsClientInterfaceTest(unittest.TestCase):
         key_content = "My key content"
         key = self.client.add_deploy_key(self.token, "username", "repo1", key_title, key_content)
         self.assert_keys_equals(key, self.expected_key)
-
 
     # helper methods
 
@@ -622,6 +625,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(key.key, expected.key)
         self.assertEqual(key.read_only, expected.read_only)
         self.assertEqual(key.created_at, expected.created_at)
+
 
 if __name__ == "__main__":
     unittest.main()

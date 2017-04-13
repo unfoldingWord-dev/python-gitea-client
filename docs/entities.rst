@@ -1,8 +1,8 @@
 Gogs Entities
 =============
 
-This pages documents classes provided by ``gogs_client`` module that represent entities
-(e.g. users and repositories) in a `Gogs <https://gogs.io/>`_ server.
+This page documents the classes provided by ``gogs_client`` module that represent entities
+(e.g. users, repositories) in a `Gogs <https://gogs.io/>`_ server.
 
 .. py:currentmodule:: gogs_client.entities
 
@@ -21,8 +21,11 @@ This pages documents classes provided by ``gogs_client`` module that represent e
 .. autoclass:: gogs_client.entities::GogsRepo.Hook()
     :members:
 
+.. autoclass:: gogs_client.entities::GogsRepo.DeployKey()
+    :members:
+
 .. autoclass:: gogs_client.entities::GogsOrg()
     :members:
 
-.. autoclass:: gogs_client.entities::GogsOrg.Team()
+.. autoclass:: gogs_client.entities::GogsTeam()
     :members:

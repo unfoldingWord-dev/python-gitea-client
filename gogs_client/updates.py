@@ -5,27 +5,13 @@ Various classes representing update requests to Gogs
 
 class GogsUserUpdate(object):
     """
-    An immutable represention of a collection of Gogs user attributes to update.
+    An immutable representation of a collection of Gogs user attributes to update.
 
     Instances should be created using the :class:`~GogsUserUpdate.Builder` class.
     """
+
     def __init__(self, source_id, login_name, full_name, email, password, website,
                  location, active, admin, allow_git_hook, allow_import_local):
-        """
-
-        :param source_id:
-        :param login_name:
-        :param full_name:
-        :param email:
-        :param password:
-        :param website:
-        :param location:
-        :param active:
-        :param admin:
-        :param allow_git_hook:
-        :param allow_import_local:
-        """
-
         self._source_id = source_id
         self._login_name = login_name
         self._full_name = full_name
@@ -186,17 +172,12 @@ class GogsUserUpdate(object):
 
 class GogsHookUpdate(object):
     """
-    An immutable represention of a collection of Gogs hook attributes to update.
+    An immutable representation of a collection of Gogs hook attributes to update.
 
     Instances should be created using the :class:`~GogsHookUpdate.Builder` class.
     """
-    def __init__(self, events, config, active):
-        """
-        :param events:
-        :param config:
-        :param active:
-        """
 
+    def __init__(self, events, config, active):
         self._events = events
         self._config = config
         self._active = active
@@ -211,17 +192,13 @@ class GogsHookUpdate(object):
 
     class Builder(object):
         def __init__(self):
-            """
-            :param str login_name: login name for authentication source
-            :param str email: email address of user to update
-            """
             self._events = None
             self._config = None
             self._active = None
 
         def set_events(self, events):
             """
-            :param list events:
+            :param List[str] events:
             :return: the updated builder
             :rtype: GogsHookUpdate.Builder
             """
