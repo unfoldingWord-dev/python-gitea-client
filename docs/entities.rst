@@ -6,8 +6,14 @@ This page documents the classes provided by ``gogs_client`` module that represen
 
 .. py:currentmodule:: gogs_client.entities
 
+GogsUser
+--------
+
 .. autoclass:: gogs_client.entities::GogsUser()
     :members:
+
+GogsRepo
+--------
 
 .. autoclass:: gogs_client.entities::GogsRepo()
     :members:
@@ -24,8 +30,14 @@ This page documents the classes provided by ``gogs_client`` module that represen
 .. autoclass:: gogs_client.entities::GogsRepo.DeployKey()
     :members:
 
+GogsOrg
+-------
+
 .. autoclass:: gogs_client.entities::GogsOrg()
     :members:
+
+GogsTeam
+--------
 
 .. autoclass:: gogs_client.entities::GogsTeam()
     :members:
