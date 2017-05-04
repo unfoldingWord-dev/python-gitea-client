@@ -15,8 +15,11 @@ def json_get(parsed_json, key):
 
 class GogsEntity(object):
     def __init__(self, json):
-        self.json = json
+        self._json = json
 
+    @property
+    def json(self):
+        return self._json
 
 class GogsUser(GogsEntity):
     """
@@ -30,7 +33,6 @@ class GogsUser(GogsEntity):
         self._full_name = full_name
         self._email = email
         self._avatar_url = avatar_url
-        self._json = json
 
     @staticmethod
     def from_json(parsed_json):
@@ -94,7 +96,7 @@ class GogsRepo(GogsEntity):
     """
 
     def __init__(self, repo_id, owner, full_name, private, fork, default_branch,
-            urls, permissions, json={}):
+            empty, size, urls, permissions, json={}):
         super(GogsRepo, self).__init__(json=json)
         self._repo_id = repo_id
         self._owner = owner
@@ -102,6 +104,8 @@ class GogsRepo(GogsEntity):
         self._private = private
         self._fork = fork
         self._default_branch = default_branch
+        self._empty = empty
+        self._size = size
         self._urls = urls
         self._permissions = permissions
 
@@ -113,11 +117,14 @@ class GogsRepo(GogsEntity):
         private = json_get(parsed_json, "private")
         fork = json_get(parsed_json, "fork")
         default_branch = json_get(parsed_json, "default_branch")
+        empty = parsed_json.get("empty", None)
+        size = parsed_json.get("size", None)
         urls = GogsRepo.Urls(json_get(parsed_json, "html_url"), json_get(parsed_json, "clone_url"),
                              json_get(parsed_json, "ssh_url"))
         permissions = GogsRepo.Permissions.from_json(json_get(parsed_json, "permissions"))
         return GogsRepo(repo_id=repo_id, owner=owner, full_name=full_name, private=private, fork=fork,
-                        default_branch=default_branch, urls=urls, permissions=permissions, json=parsed_json)
+                        default_branch=default_branch, empty=empty, size=size, urls=urls,
+                        permissions=permissions, json=parsed_json)
 
     @property  # named repo_id to avoid conflict with built-in id
     def repo_id(self):
@@ -169,9 +176,27 @@ class GogsRepo(GogsEntity):
         """
         The name of the default branch
 
-        :rtype: bool
+        :rtype: str
         """
         return self._default_branch
+
+    @property
+    def empty(self):
+        """
+        Whether the repository is empty
+
+        :rtype: bool
+        """
+        return self._empty
+
+    @property
+    def size(self):
+        """
+        Size of the repository in kilobytes
+
+        :rtype: int
+        """
+        return self._size
 
     @property
     def urls(self):
