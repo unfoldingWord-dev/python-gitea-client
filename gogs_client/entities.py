@@ -12,583 +12,383 @@ def json_get(parsed_json, key):
         raise ValueError("JSON does not contain a {} field".format(key))
     return parsed_json[key]
 
+import attr
 
+from collections import OrderedDict
+
+@attr.s
 class GogsEntity(object):
-    def __init__(self, json):
-        self._json = json
+    json = attr.ib()
+    @classmethod
+    def from_json(cls, parsed_json):
+        # with introspection, get arguments of the constructor
+        parsed_json['json'] = parsed_json.copy()
+        params = cls.__attrs_attrs__
+        args = []
+        kwargs = OrderedDict()
+        for param in params:
+            param_name = param.name.lstrip('_')
+            # if not a keyword argument
+            if param.default == attr.NOTHING:
+                args.append(json_get(parsed_json, param_name))
+            # if it's a keyword argument
+            else:
+                kwargs[param_name] = parsed_json.get(param_name, None)
+        o = cls(*args, **kwargs)
+        return o
 
-    @property
-    def json(self):
-        return self._json
 
+@attr.s(frozen=True)
 class GogsUser(GogsEntity):
     """
      An immutable representation of a Gogs user
     """
 
-    def __init__(self, user_id, username, full_name, email, avatar_url, json={}):
-        super(GogsUser, self).__init__(json=json)
-        self._id = user_id
-        self._username = username
-        self._full_name = full_name
-        self._email = email
-        self._avatar_url = avatar_url
+    """
+    The user's id
 
-    @staticmethod
-    def from_json(parsed_json):
-        user_id = json_get(parsed_json, "id")
-        username = json_get(parsed_json, "username")
-        full_name = json_get(parsed_json, "full_name")
-        email = parsed_json.get("email", None)
-        avatar_url = parsed_json.get("avatar_url", None)
-        return GogsUser(user_id=user_id, username=username, full_name=full_name,
-                        email=email, avatar_url=avatar_url, json=parsed_json)
+    :rtype: int
+    """
+    id = attr.ib()
+    user_id = property(lambda self: self.id)
 
-    @property  # named user_id to avoid conflict with built-in id
-    def user_id(self):
-        """
-        The user's id
+    """
+    The user's username
 
-        :rtype: int
-        """
-        return self._id
+    :rtype: str
+    """
+    username = attr.ib()
 
-    @property
-    def username(self):
-        """
-        The user's username
+    """
+    The user's full name
 
-        :rtype: str
-        """
-        return self._username
+    :rtype: str
+    """
+    full_name = attr.ib()
 
-    @property
-    def full_name(self):
-        """
-        The user's full name
+    """
+    The user's email address. Can be empty as a result of invalid authentication
 
-        :rtype: str
-        """
-        return self._full_name
+    :rtype: str
+    """
+    email = attr.ib(default=None)
 
-    @property
-    def email(self):
-        """
-        The user's email address. Can be empty as a result of invalid authentication
+    """
+    The user's avatar URL
 
-        :rtype: str
-        """
-        return self._email
-
-    @property
-    def avatar_url(self):
-        """
-        The user's avatar URL
-
-        :rtype: str
-        """
-        return self._avatar_url
+    :rtype: str
+    """
+    avatar_url = attr.ib(default=None)
 
 
+@attr.s(frozen=True)
 class GogsRepo(GogsEntity):
     """
     An immutable representation of a Gogs repository
     """
 
-    def __init__(self, repo_id, owner, full_name, private, fork, parent, default_branch,
-            empty, size, urls, permissions, json={}):
-        super(GogsRepo, self).__init__(json=json)
-        self._repo_id = repo_id
-        self._owner = owner
-        self._full_name = full_name
-        self._private = private
-        self._fork = fork
-        self._parent = parent
-        self._default_branch = default_branch
-        self._empty = empty
-        self._size = size
-        self._urls = urls
-        self._permissions = permissions
+    """
+    The repository's id
 
-    @staticmethod
-    def from_json(parsed_json):
-        repo_id = json_get(parsed_json, "id")
-        owner = GogsUser.from_json(json_get(parsed_json, "owner"))
-        full_name = json_get(parsed_json, "full_name")
-        private = json_get(parsed_json, "private")
-        fork = json_get(parsed_json, "fork")
-        parent = parsed_json.get("parent", None)
-        if parent:
-            parent = GogsRepo.from_json(parent)
-        default_branch = json_get(parsed_json, "default_branch")
-        empty = parsed_json.get("empty", None)
-        size = parsed_json.get("size", None)
-        urls = GogsRepo.Urls(json_get(parsed_json, "html_url"), json_get(parsed_json, "clone_url"),
-                             json_get(parsed_json, "ssh_url"))
-        permissions = GogsRepo.Permissions.from_json(json_get(parsed_json, "permissions"))
-        return GogsRepo(repo_id=repo_id, owner=owner, full_name=full_name, private=private, fork=fork,
-                        parent=parent, default_branch=default_branch, empty=empty, size=size,
-                        urls=urls, permissions=permissions, json=parsed_json)
+    :rtype: int
+    """
+    id = attr.ib()
+    repo_id = property(lambda self: self.id)
 
-    @property  # named repo_id to avoid conflict with built-in id
-    def repo_id(self):
-        """
-        The repository's id
+    """
+    The owner of the repository
 
-        :rtype: int
-        """
-        return self._repo_id
+    :rtype: entities.GogsUser
+    """
+    owner = attr.ib(convert=lambda parsed_json:GogsUser.from_json(parsed_json))
 
-    @property
-    def owner(self):
-        """
-        The owner of the repository
+    """
+    The full name of the repository
 
-        :rtype: entities.GogsUser
-        """
-        return self._owner
+    :rtype: str
+    """
+    full_name = attr.ib()
 
-    @property
-    def full_name(self):
-        """
-        The full name of the repository
+    """
+    Whether the repository is private
 
-        :rtype: str
-        """
-        return self._full_name
+    :rtype: bool
+    """
+    private = attr.ib()
 
-    @property
-    def private(self):
-        """
-        Whether the repository is private
+    """
+    Whether the repository is a fork
 
-        :rtype: bool
-        """
-        return self._private
+    :rtype: bool
+    """
+    fork = attr.ib()
 
-    @property
-    def fork(self):
-        """
-        Whether the repository is a fork
+    """
+    The name of the default branch
 
-        :rtype: bool
-        """
-        return self._fork
+    :rtype: str
+    """
+    default_branch = attr.ib()
 
-    @property
-    def parent(self):
-        """
-        Gets the repository's parent, when a fork
+    """
+    URLs of the repository
 
-        :rtype: GogsRepo
-        """
-        return self._parent
-
-    @property
-    def default_branch(self):
-        """
-        The name of the default branch
-
-        :rtype: str
-        """
-        return self._default_branch
-
-    @property
-    def empty(self):
-        """
-        Whether the repository is empty
-
-        :rtype: bool
-        """
-        return self._empty
-
-    @property
-    def size(self):
-        """
-        Size of the repository in kilobytes
-
-        :rtype: int
-        """
-        return self._size
-
+    :rtype: GogsRepo.Urls
+    """
+    _ssh_url = attr.ib()
+    _html_url = attr.ib()
+    _clone_url = attr.ib()
     @property
     def urls(self):
-        """
-        URLs of the repository
+        return GogsRepo.Urls(self._html_url, self._clone_url,self._ssh_url)
 
-        :rtype: GogsRepo.Urls
-        """
-        return self._urls
+    """
+    Permissions for the repository
 
-    @property
-    def permissions(self):
-        """
-        Permissions for the repository
+    :rtype: GogsRepo.Permissions
+    """
+    permissions = attr.ib(convert=lambda data:GogsRepo.Permissions.from_json(data))
 
-        :rtype: GogsRepo.Permissions
-        """
-        return self._permissions
+    """
+    Gets the repository's parent, when a fork
 
+    :rtype: GogsRepo
+    """
+    parent = attr.ib(convert=lambda data:GogsRepo.from_json(data) if data else None, default=None)
+
+    """
+    Whether the repository is empty
+
+    :rtype: bool
+    """
+    empty = attr.ib(default=None)
+
+    """
+    Size of the repository in kilobytes
+
+    :rtype: int
+    """
+    size = attr.ib(default=None)
+
+    @attr.s(frozen=True)
     class Urls(object):
-        def __init__(self, html_url, clone_url, ssh_url):
-            self._html_url = html_url
-            self._clone_url = clone_url
-            self._ssh_url = ssh_url
+        """
+        URL for the repository's webpage
 
-        @property
-        def html_url(self):
-            """
-            URL for the repository's webpage
+        :rtype: str
+        """
+        html_url = attr.ib()
 
-            :rtype: str
-            """
-            return self._html_url
+        """
+        URL for cloning the repository (via HTTP)
 
-        @property
-        def clone_url(self):
-            """
-            URL for cloning the repository (via HTTP)
+        :rtype: str
+        """
+        clone_url = attr.ib()
 
-            :rtype: str
-            """
-            return self._clone_url
+        """
+        URL for cloning the repository via SSH
 
-        @property
-        def ssh_url(self):
-            """
-            URL for cloning the repository via SSH
+        :rtype: str
+        """
+        ssh_url = attr.ib()
 
-            :rtype: str
-            """
-            return self._ssh_url
-
+    @attr.s(frozen=True)
     class Permissions(GogsEntity):
-        def __init__(self, admin, push, pull, json={}):
-            super(GogsRepo.Permissions, self).__init__(json=json)
-            self._admin = admin
-            self._push = push
-            self._pull = pull
+        """
+        Whether the user that requested this repository has admin permissions
 
-        @staticmethod
-        def from_json(parsed_json):
-            admin = parsed_json.get("admin", False)
-            push = parsed_json.get("push", False)
-            pull = parsed_json.get("pull", False)
-            return GogsRepo.Permissions(admin, push, pull, parsed_json)
+        :rtype: bool
+        """
+        admin = attr.ib(default=False)
 
-        @property
-        def admin(self):
-            """
-            Whether the user that requested this repository has admin permissions
+        """
+        Whether the user that requested this repository has push permissions
 
-            :rtype: bool
-            """
-            return self._admin
+        :rtype: bool
+        """
+        push = attr.ib(default=False)
 
-        @property
-        def push(self):
-            """
-            Whether the user that requested this repository has push permissions
+        """
+        Whether the user that requested this repository has pull permissions
 
-            :rtype: bool
-            """
-            return self._push
+        :rtype: bool
+        """
+        pull = attr.ib(default=False)
 
-        @property
-        def pull(self):
-            """
-            Whether the user that requested this repository has pull permissions
-
-            :rtype: bool
-            """
-            return self._pull
-
+    @attr.s(frozen=True)
     class Hook(GogsEntity):
-        def __init__(self, hook_id, hook_type, events, active, config, json={}):
-            super(GogsRepo.Hook, self).__init__(json=json)
-            self._id = hook_id
-            self._type = hook_type
-            self._events = events
-            self._active = active
-            self._config = config
+        """
+        The hook's id number
 
-        @staticmethod
-        def from_json(parsed_json):
-            hook_id = json_get(parsed_json, "id")
-            hook_type = json_get(parsed_json, "type")
-            events = json_get(parsed_json, "events")
-            active = json_get(parsed_json, "active")
-            config = json_get(parsed_json, "config")
-            return GogsRepo.Hook(hook_id=hook_id, hook_type=hook_type, events=events, active=active,
-                                 config=config, json=parsed_json)
+        :rtype: int
+        """
+        id = attr.ib()
+        hook_id = property(lambda self: self.id)
 
-        @property  # named hook_id to avoid conflict with built-in id
-        def hook_id(self):
-            """
-            The hook's id number
+        """
+        The hook's type (gogs, slack, etc.)
 
-            :rtype: int
-            """
-            return self._id
+        :rtype: str
+        """
+        type = attr.ib()
+        hook_type = property(lambda self: self.type)
 
-        @property  # named hook_type to avoid conflict with built-in type
-        def hook_type(self):
-            """
-            The hook's type (gogs, slack, etc.)
+        """
+        The events that fire the hook
 
-            :rtype: str
-            """
-            return self._type
+        :rtype: List[str]
+        """
+        events = attr.ib()
 
-        @property
-        def events(self):
-            """
-            The events that fire the hook
+        """
+        Whether the hook is active
 
-            :rtype: List[str]
-            """
-            return self._events
+        :rtype: bool
+        """
+        active = attr.ib()
 
-        @property
-        def active(self):
-            """
-            Whether the hook is active
+        """
+        Config of the hook. Possible keys include ``"content_type"``, ``"url"``, ``"secret"``
 
-            :rtype: bool
-            """
-            return self._active
+        :rtype: dict
+        """
+        config = attr.ib()
 
-        @property
-        def config(self):
-            """
-            Config of the hook. Possible keys include ``"content_type"``, ``"url"``, ``"secret"``
-
-            :rtype: dict
-            """
-            return self._config
-
+    @attr.s(frozen=True)
     class DeployKey(GogsEntity):
-        def __init__(self, key_id, key, url, title, created_at, read_only, json={}):
-            super(GogsRepo.DeployKey, self).__init__(json=json)
-            self._id = key_id
-            self._key = key
-            self._url = url
-            self._title = title
-            self._created_at = created_at
-            self._read_only = read_only
+        """
+        The key's id number
 
-        @staticmethod
-        def from_json(parsed_json):
-            key_id = json_get(parsed_json, "id")
-            key = json_get(parsed_json, "key")
-            url = json_get(parsed_json, "url")
-            title = json_get(parsed_json, "title")
-            created_at = json_get(parsed_json, "created_at")
-            read_only = json_get(parsed_json, "read_only")
+        :rtype: int
+        """
+        id = attr.ib()
+        key_id = property(lambda self: self.id)
 
-            return GogsRepo.DeployKey(key_id=key_id, key=key, url=url,
-                                      title=title, created_at=created_at,
-                                      read_only=read_only, json=parsed_json)
+        """
+        The content of the key
 
-        @property  # named key_id to avoid conflict with built-in id
-        def key_id(self):
-            """
-            The key's id number
+        :rtype: str
+        """
+        key = attr.ib()
 
-            :rtype: int
-            """
-            return self._id
+        """
+        URL where the key can be found
 
-        @property
-        def key(self):
-            """
-            The content of the key
+        :rtype: str
+        """
+        url = attr.ib()
 
-            :rtype: str
-            """
-            return self._key
+        """
+        The name of the key
 
-        @property
-        def url(self):
-            """
-            URL where the key can be found
+        :rtype: str
+        """
+        title = attr.ib()
 
-            :rtype: str
-            """
-            return self._url
+        """
+        Creation date of the key
 
-        @property
-        def title(self):
-            """
-            The name of the key
+        :rtype: str
+        """
+        created_at = attr.ib()
 
-            :rtype: str
-            """
-            return self._title
+        """
+        Whether key is read-only
 
-        @property
-        def created_at(self):
-            """
-            Creation date of the key
-
-            :rtype: str
-            """
-            return self._created_at
-
-        @property
-        def read_only(self):
-            """
-            Whether key is read-only
-
-            :rtype: bool
-            """
-            return self._read_only
+        :rtype: bool
+        """
+        read_only = attr.ib()
 
 
+@attr.s(frozen=True)
 class GogsOrg(GogsEntity):
     """
      An immutable representation of a Gogs Organization
     """
 
-    def __init__(self, org_id, username, full_name, avatar_url, description, website, location, json={}):
-        super(GogsOrg, self).__init__(json=json)
-        self._id = org_id
-        self._username = username
-        self._full_name = full_name
-        self._avatar_url = avatar_url
-        self._description = description
-        self._website = website
-        self._location = location
+    """
+    The organization's id
 
-    @staticmethod
-    def from_json(parsed_json):
-        org_id = json_get(parsed_json, "id")
-        username = json_get(parsed_json, "username")
-        full_name = json_get(parsed_json, "full_name")
-        avatar_url = json_get(parsed_json, "avatar_url")
-        description = json_get(parsed_json, "description")
-        website = json_get(parsed_json, "website")
-        location = json_get(parsed_json, "location")
-        return GogsOrg(org_id=org_id, username=username, full_name=full_name,
-                       avatar_url=avatar_url, description=description,
-                       website=website, location=location, json=parsed_json)
+    :rtype: int
+    """
+    id = attr.ib()
+    org_id = property(lambda self: self.id)
 
-    @property  # named org_id to avoid conflict with built-in id
-    def org_id(self):
-        """
-        The organization's id
+    """
+    Organization's username
 
-        :rtype: int
-        """
-        return self._id
+    :rtype: str
+    """
+    username = attr.ib()
 
-    @property
-    def username(self):
-        """
-        Organization's username
+    """
+    Organization's full name
 
-        :rtype: str
-        """
-        return self._username
+    :rtype: str
+    """
+    full_name = attr.ib()
 
-    @property
-    def full_name(self):
-        """
-        Organization's full name
+    """
+    Organization's avatar url
 
-        :rtype: str
-        """
-        return self._full_name
+    :rtype: str
+    """
+    avatar_url = attr.ib()
 
-    @property
-    def avatar_url(self):
-        """
-        Organization's avatar url
+    """
+    Organization's description
 
-        :rtype: str
-        """
-        return self._avatar_url
+    :rtype: str
+    """
+    description = attr.ib()
 
-    @property
-    def description(self):
-        """
-        Organization's description
+    """
+    Organization's website address
 
-        :rtype: str
-        """
-        return self._description
+    :rtype: str
+    """
+    website = attr.ib()
 
-    @property
-    def website(self):
-        """
-        Organization's website address
+    """
+    Organization's location
 
-        :rtype: str
-        """
-        return self._website
+    :rtype: str
+    """
+    location = attr.ib()
 
-    @property
-    def location(self):
-        """
-        Organization's location
-
-        :rtype: str
-        """
-        return self._location
-
-
+@attr.s(frozen=True)
 class GogsTeam(GogsEntity):
     """
     An immutable representation of a Gogs organization team
     """
-    def __init__(self, team_id, name, description, permission, json={}):
-        super(GogsTeam, self).__init__(json=json)
-        self._id = team_id
-        self._name = name
-        self._description = description
-        self._permission = permission
 
-    @staticmethod
-    def from_json(parsed_json):
-        team_id = json_get(parsed_json, "id")
-        name = json_get(parsed_json, "name")
-        description = json_get(parsed_json, "description")
-        permission = json_get(parsed_json, "permission")
-        return GogsTeam(team_id=team_id, name=name, description=description,
-                permission=permission, json=parsed_json)
+    """
+    Team's id
 
-    @property  # named team_id to avoid conflict with built-in id
-    def team_id(self):
-        """
-        Team's id
+    :rtype: int
+    """
+    id = attr.ib()
+    team_id = property(lambda self: self.id)
 
-        :rtype: int
-        """
-        return self._id
+    """
+    Team name
 
-    @property
-    def name(self):
-        """
-        Team name
+    :rtype: str
+    """
+    name = attr.ib()
 
-        :rtype: str
-        """
-        return self._name
+    """
+    Description of the team
 
-    @property
-    def description(self):
-        """
-        Description of the team
+    :rtype: str
+    """
+    description = attr.ib()
 
-        :rtype: str
-        """
-        return self._description
+    """
+    Team permission, can be read, write or admin, default is read
 
-    @property
-    def permission(self):
-        """
-        Team permission, can be read, write or admin, default is read
+    :rtype: int
+    """
+    permission = attr.ib()
 
-        :rtype: int
-        """
-        return self._permission
