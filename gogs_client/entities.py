@@ -13,12 +13,21 @@ def json_get(parsed_json, key):
     return parsed_json[key]
 
 
-class GogsUser(object):
+class GogsEntity(object):
+    def __init__(self, json):
+        self._json = json
+
+    @property
+    def json(self):
+        return self._json
+
+class GogsUser(GogsEntity):
     """
      An immutable representation of a Gogs user
     """
 
-    def __init__(self, user_id, username, full_name, email, avatar_url):
+    def __init__(self, user_id, username, full_name, email, avatar_url, json={}):
+        super(GogsUser, self).__init__(json=json)
         self._id = user_id
         self._username = username
         self._full_name = full_name
@@ -33,7 +42,7 @@ class GogsUser(object):
         email = parsed_json.get("email", None)
         avatar_url = parsed_json.get("avatar_url", None)
         return GogsUser(user_id=user_id, username=username, full_name=full_name,
-                        email=email, avatar_url=avatar_url)
+                        email=email, avatar_url=avatar_url, json=parsed_json)
 
     @property  # named user_id to avoid conflict with built-in id
     def user_id(self):
@@ -81,17 +90,22 @@ class GogsUser(object):
         return self._avatar_url
 
 
-class GogsRepo(object):
+class GogsRepo(GogsEntity):
     """
     An immutable representation of a Gogs repository
     """
 
-    def __init__(self, repo_id, owner, full_name, private, fork, urls, permissions):
+    def __init__(self, repo_id, owner, full_name, private, fork, default_branch,
+            empty, size, urls, permissions, json={}):
+        super(GogsRepo, self).__init__(json=json)
         self._repo_id = repo_id
         self._owner = owner
         self._full_name = full_name
         self._private = private
         self._fork = fork
+        self._default_branch = default_branch
+        self._empty = empty
+        self._size = size
         self._urls = urls
         self._permissions = permissions
 
@@ -102,11 +116,15 @@ class GogsRepo(object):
         full_name = json_get(parsed_json, "full_name")
         private = json_get(parsed_json, "private")
         fork = json_get(parsed_json, "fork")
+        default_branch = json_get(parsed_json, "default_branch")
+        empty = parsed_json.get("empty", None)
+        size = parsed_json.get("size", None)
         urls = GogsRepo.Urls(json_get(parsed_json, "html_url"), json_get(parsed_json, "clone_url"),
                              json_get(parsed_json, "ssh_url"))
         permissions = GogsRepo.Permissions.from_json(json_get(parsed_json, "permissions"))
         return GogsRepo(repo_id=repo_id, owner=owner, full_name=full_name, private=private, fork=fork,
-                        urls=urls, permissions=permissions)
+                        default_branch=default_branch, empty=empty, size=size, urls=urls,
+                        permissions=permissions, json=parsed_json)
 
     @property  # named repo_id to avoid conflict with built-in id
     def repo_id(self):
@@ -152,6 +170,33 @@ class GogsRepo(object):
         :rtype: bool
         """
         return self._fork
+
+    @property
+    def default_branch(self):
+        """
+        The name of the default branch
+
+        :rtype: str
+        """
+        return self._default_branch
+
+    @property
+    def empty(self):
+        """
+        Whether the repository is empty
+
+        :rtype: bool
+        """
+        return self._empty
+
+    @property
+    def size(self):
+        """
+        Size of the repository in kilobytes
+
+        :rtype: int
+        """
+        return self._size
 
     @property
     def urls(self):
@@ -204,8 +249,9 @@ class GogsRepo(object):
             """
             return self._ssh_url
 
-    class Permissions(object):
-        def __init__(self, admin, push, pull):
+    class Permissions(GogsEntity):
+        def __init__(self, admin, push, pull, json={}):
+            super(GogsRepo.Permissions, self).__init__(json=json)
             self._admin = admin
             self._push = push
             self._pull = pull
@@ -215,7 +261,7 @@ class GogsRepo(object):
             admin = parsed_json.get("admin", False)
             push = parsed_json.get("push", False)
             pull = parsed_json.get("pull", False)
-            return GogsRepo.Permissions(admin, push, pull)
+            return GogsRepo.Permissions(admin, push, pull, parsed_json)
 
         @property
         def admin(self):
@@ -244,8 +290,9 @@ class GogsRepo(object):
             """
             return self._pull
 
-    class Hook(object):
-        def __init__(self, hook_id, hook_type, events, active, config):
+    class Hook(GogsEntity):
+        def __init__(self, hook_id, hook_type, events, active, config, json={}):
+            super(GogsRepo.Hook, self).__init__(json=json)
             self._id = hook_id
             self._type = hook_type
             self._events = events
@@ -260,7 +307,7 @@ class GogsRepo(object):
             active = json_get(parsed_json, "active")
             config = json_get(parsed_json, "config")
             return GogsRepo.Hook(hook_id=hook_id, hook_type=hook_type, events=events, active=active,
-                                 config=config)
+                                 config=config, json=parsed_json)
 
         @property  # named hook_id to avoid conflict with built-in id
         def hook_id(self):
@@ -307,8 +354,9 @@ class GogsRepo(object):
             """
             return self._config
 
-    class DeployKey(object):
-        def __init__(self, key_id, key, url, title, created_at, read_only):
+    class DeployKey(GogsEntity):
+        def __init__(self, key_id, key, url, title, created_at, read_only, json={}):
+            super(GogsRepo.DeployKey, self).__init__(json=json)
             self._id = key_id
             self._key = key
             self._url = url
@@ -326,7 +374,8 @@ class GogsRepo(object):
             read_only = json_get(parsed_json, "read_only")
 
             return GogsRepo.DeployKey(key_id=key_id, key=key, url=url,
-                                      title=title, created_at=created_at, read_only=read_only)
+                                      title=title, created_at=created_at,
+                                      read_only=read_only, json=parsed_json)
 
         @property  # named key_id to avoid conflict with built-in id
         def key_id(self):
@@ -383,12 +432,13 @@ class GogsRepo(object):
             return self._read_only
 
 
-class GogsOrg(object):
+class GogsOrg(GogsEntity):
     """
      An immutable representation of a Gogs Organization
     """
 
-    def __init__(self, org_id, username, full_name, avatar_url, description, website, location):
+    def __init__(self, org_id, username, full_name, avatar_url, description, website, location, json={}):
+        super(GogsOrg, self).__init__(json=json)
         self._id = org_id
         self._username = username
         self._full_name = full_name
@@ -408,7 +458,7 @@ class GogsOrg(object):
         location = json_get(parsed_json, "location")
         return GogsOrg(org_id=org_id, username=username, full_name=full_name,
                        avatar_url=avatar_url, description=description,
-                       website=website, location=location)
+                       website=website, location=location, json=parsed_json)
 
     @property  # named org_id to avoid conflict with built-in id
     def org_id(self):
@@ -474,11 +524,12 @@ class GogsOrg(object):
         return self._location
 
 
-class GogsTeam(object):
+class GogsTeam(GogsEntity):
     """
     An immutable representation of a Gogs organization team
     """
-    def __init__(self, team_id, name, description, permission):
+    def __init__(self, team_id, name, description, permission, json={}):
+        super(GogsTeam, self).__init__(json=json)
         self._id = team_id
         self._name = name
         self._description = description
@@ -490,7 +541,8 @@ class GogsTeam(object):
         name = json_get(parsed_json, "name")
         description = json_get(parsed_json, "description")
         permission = json_get(parsed_json, "permission")
-        return GogsTeam(team_id=team_id, name=name, description=description, permission=permission)
+        return GogsTeam(team_id=team_id, name=name, description=description,
+                permission=permission, json=parsed_json)
 
     @property  # named team_id to avoid conflict with built-in id
     def team_id(self):

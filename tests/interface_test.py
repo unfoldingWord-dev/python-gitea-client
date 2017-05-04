@@ -26,6 +26,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World",
                   "private": false,
                   "fork": false,
+                  "default_branch": "master",
+                  "empty": false,
+                  "size": 42,
                   "html_url": "http://localhost:3000/unknwon/Hello-World",
                   "clone_url": "http://localhost:3000/unknwon/hello-world.git",
                   "ssh_url": "jiahuachen@localhost:unknwon/hello-world.git",
@@ -47,6 +50,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World",
                   "private": false,
                   "fork": false,
+                  "default_branch": "master",
+                  "empty": false,
+                  "size": 42,
                   "html_url": "http://localhost:3000/unknwon/Hello-World",
                   "clone_url": "http://localhost:3000/unknwon/hello-world.git",
                   "ssh_url": "jiahuachen@localhost:unknwon/hello-world.git",
@@ -67,6 +73,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World-Again",
                   "private": false,
                   "fork": false,
+                  "default_branch": "master",
+                  "empty": false,
+                  "size": 42,
                   "html_url": "http://localhost:3000/unknwon/Hello-World-Again",
                   "clone_url": "http://localhost:3000/unknwon/hello-world-again.git",
                   "ssh_url": "jiahuachen@localhost:unknwon/hello-world-again.git",
@@ -578,6 +587,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(repo.full_name, expected.full_name)
         self.assertEqual(repo.private, expected.private)
         self.assertEqual(repo.fork, expected.fork)
+        self.assertEqual(repo.default_branch, expected.default_branch)
+        self.assertEqual(repo.size, expected.size)
+        self.assertEqual(repo.empty, expected.empty)
         self.assertEqual(repo.urls.html_url, expected.urls.html_url)
         self.assertEqual(repo.urls.clone_url, expected.urls.clone_url)
         self.assertEqual(repo.urls.ssh_url, expected.urls.ssh_url)
