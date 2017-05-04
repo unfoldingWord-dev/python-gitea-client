@@ -27,6 +27,6 @@ setup(
     ],
     keywords=["gogs", "http", "client"],
     packages=find_packages(),
-    install_requires=["future", "requests"],
+    install_requires=["future", "requests", "attrs"],
     test_suite="tests"
 )

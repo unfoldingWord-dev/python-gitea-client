@@ -344,7 +344,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             self.assertRegexpMatches(str(data["active"]), r"[tT]rue")
             self.assertRegexpMatches(str(data["admin"]), r"[fF]alse")
             self.assertRegexpMatches(str(data["allow_git_hook"]), r"[fF]alse")
-            self.assertNotIn("source_id", data)
+            self.assertNotIn("id", data)
             self.assertNotIn("location", data)
             self.assertNotIn("allow_import_local", data)
             return 200, {}, self.user_json_str
@@ -585,7 +585,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(request.headers["Authorization"], "Basic {}".format(b64))
 
     def assert_repos_equal(self, repo, expected):
-        self.assertEqual(repo.repo_id, expected.repo_id)
+        self.assertEqual(repo.id, expected.id)
         self.assert_users_equals(repo.owner, expected.owner)
         self.assertEqual(repo.full_name, expected.full_name)
         self.assertEqual(repo.private, expected.private)
@@ -602,7 +602,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(repo.permissions.pull, expected.permissions.pull)
 
     def assert_users_equals(self, user, expected):
-        self.assertEqual(user.user_id, expected.user_id)
+        self.assertEqual(user.id, expected.id)
         self.assertEqual(user.username, expected.username)
         self.assertEqual(user.full_name, expected.full_name)
         self.assertEqual(user.email, expected.email)
@@ -613,14 +613,14 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(token.token, expected.token)
 
     def assert_hooks_equals(self, hook, expected):
-        self.assertEqual(hook.hook_id, expected.hook_id)
-        self.assertEqual(hook.hook_type, expected.hook_type)
+        self.assertEqual(hook.id, expected.id)
+        self.assertEqual(hook.type, expected.type)
         self.assertEqual(hook.events, expected.events)
         self.assertEqual(hook.config, expected.config)
         self.assertEqual(hook.active, expected.active)
 
     def assert_org_equals(self, org, expected):
-        self.assertEqual(org.org_id, expected.org_id)
+        self.assertEqual(org.id, expected.id)
         self.assertEqual(org.username, expected.username)
         self.assertEqual(org.full_name, expected.full_name)
         self.assertEqual(org.avatar_url, expected.avatar_url)
@@ -629,13 +629,13 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(org.location, expected.location)
 
     def assert_team_equals(self, team, expected):
-        self.assertEqual(team.team_id, expected.team_id)
+        self.assertEqual(team.id, expected.id)
         self.assertEqual(team.name, expected.name)
         self.assertEqual(team.description, expected.description)
         self.assertEqual(team.permission, expected.permission)
 
     def assert_keys_equals(self, key, expected):
-        self.assertEqual(key.key_id, expected.key_id)
+        self.assertEqual(key.id, expected.id)
         self.assertEqual(key.title, expected.title)
         self.assertEqual(key.url, expected.url)
         self.assertEqual(key.key, expected.key)
