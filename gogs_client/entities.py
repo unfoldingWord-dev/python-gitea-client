@@ -95,7 +95,7 @@ class GogsRepo(GogsEntity):
     An immutable representation of a Gogs repository
     """
 
-    def __init__(self, repo_id, owner, full_name, private, fork, default_branch,
+    def __init__(self, repo_id, owner, full_name, private, fork, parent_id, parent, default_branch,
             empty, size, urls, permissions, json={}):
         super(GogsRepo, self).__init__(json=json)
         self._repo_id = repo_id
@@ -103,6 +103,7 @@ class GogsRepo(GogsEntity):
         self._full_name = full_name
         self._private = private
         self._fork = fork
+        self._parent_id = parent_id
         self._default_branch = default_branch
         self._empty = empty
         self._size = size
@@ -116,6 +117,7 @@ class GogsRepo(GogsEntity):
         full_name = json_get(parsed_json, "full_name")
         private = json_get(parsed_json, "private")
         fork = json_get(parsed_json, "fork")
+        parent_id = parsed_json.get("parent_id", None)
         default_branch = json_get(parsed_json, "default_branch")
         empty = parsed_json.get("empty", None)
         size = parsed_json.get("size", None)
@@ -123,8 +125,8 @@ class GogsRepo(GogsEntity):
                              json_get(parsed_json, "ssh_url"))
         permissions = GogsRepo.Permissions.from_json(json_get(parsed_json, "permissions"))
         return GogsRepo(repo_id=repo_id, owner=owner, full_name=full_name, private=private, fork=fork,
-                        default_branch=default_branch, empty=empty, size=size, urls=urls,
-                        permissions=permissions, json=parsed_json)
+                        parent_id=parent_id, default_branch=default_branch, empty=empty, size=size,
+                        urls=urls, permissions=permissions, json=parsed_json)
 
     @property  # named repo_id to avoid conflict with built-in id
     def repo_id(self):
@@ -170,6 +172,15 @@ class GogsRepo(GogsEntity):
         :rtype: bool
         """
         return self._fork
+
+    @property
+    def parent_id(self):
+        """
+        Gets the repository's parent, when a fork
+
+        :rtype: int
+        """
+        return self.parent_id
 
     @property
     def default_branch(self):
