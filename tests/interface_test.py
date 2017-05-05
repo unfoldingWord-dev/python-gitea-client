@@ -26,6 +26,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World",
                   "private": false,
                   "fork": false,
+                  "parent_id": null,
                   "default_branch": "master",
                   "empty": false,
                   "size": 42,
@@ -50,6 +51,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World",
                   "private": false,
                   "fork": false,
+                  "parent_id": null,
                   "default_branch": "master",
                   "empty": false,
                   "size": 42,
@@ -73,6 +75,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "full_name": "unknwon/Hello-World-Again",
                   "private": false,
                   "fork": false,
+                  "parent_id": null,
                   "default_branch": "master",
                   "empty": false,
                   "size": 42,
@@ -587,6 +590,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(repo.full_name, expected.full_name)
         self.assertEqual(repo.private, expected.private)
         self.assertEqual(repo.fork, expected.fork)
+        self.assertEqual(repo.parent_id, expected.parent_id)
         self.assertEqual(repo.default_branch, expected.default_branch)
         self.assertEqual(repo.size, expected.size)
         self.assertEqual(repo.empty, expected.empty)
