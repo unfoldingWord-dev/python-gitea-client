@@ -95,7 +95,7 @@ class GogsRepo(GogsEntity):
     An immutable representation of a Gogs repository
     """
 
-    def __init__(self, repo_id, owner, full_name, private, fork, parent_id, parent, default_branch,
+    def __init__(self, repo_id, owner, full_name, private, fork, parent_id, default_branch,
             empty, size, urls, permissions, json={}):
         super(GogsRepo, self).__init__(json=json)
         self._repo_id = repo_id
