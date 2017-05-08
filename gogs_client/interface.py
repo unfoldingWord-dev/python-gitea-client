@@ -50,8 +50,8 @@ class GogsApi(object):
         uses the user authenticated by ``auth``.
 
         :param auth.Authentication auth: authentication for user to retrieve.
-        Must be a username-password authentication, due to a restriction of the
-        Gogs API
+                                         Must be a username-password authentication,
+                                         due to a restriction of the Gogs API
         :param str username: username of owner of tokens
 
         :return: list of tokens
@@ -70,8 +70,8 @@ class GogsApi(object):
         If no user is specified, uses user authenticated by ``auth``.
 
         :param auth.Authentication auth: authentication for user to retrieve.
-        Must be a username-password authentication, due to a restriction of the
-        Gogs API
+                                         Must be a username-password authentication,
+                                         due to a restriction of the Gogs API
         :param str name: name of new token
         :param str username: username of owner of new token
 
@@ -93,8 +93,8 @@ class GogsApi(object):
         specified, uses user authenticated by ``auth``.
 
         :param auth.Authentication auth: authentication for user to retrieve.
-        Must be a username-password authentication, due to a restriction of the
-        Gogs API
+                                         Must be a username-password authentication,
+                                         due to a restriction of the Gogs API
         :param str name: name of new token
         :param str username: username of owner of new token
 
