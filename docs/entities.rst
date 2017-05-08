@@ -10,7 +10,21 @@ GogsUser
 --------
 
 .. autoclass:: gogs_client.entities::GogsUser()
-    :members:
+
+    .. autoattribute:: id
+        :annotation:
+
+    .. autoattribute:: username
+        :annotation:
+
+    .. autoattribute:: email
+        :annotation:
+
+    .. autoattribute:: full_name
+        :annotation:
+
+    .. autoattribute:: avatar_url
+        :annotation:
 
 GogsRepo
 --------

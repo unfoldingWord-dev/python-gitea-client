@@ -2,6 +2,10 @@
 Various immutable classes that represent Gogs entities.
 """
 
+from collections import OrderedDict
+
+import attr
+
 
 def json_get(parsed_json, key):
     """
@@ -12,13 +16,11 @@ def json_get(parsed_json, key):
         raise ValueError("JSON does not contain a {} field".format(key))
     return parsed_json[key]
 
-import attr
-
-from collections import OrderedDict
 
 @attr.s
 class GogsEntity(object):
     json = attr.ib()
+
     @classmethod
     def from_json(cls, parsed_json):
         # with introspection, get arguments of the constructor
@@ -44,40 +46,31 @@ class GogsUser(GogsEntity):
      An immutable representation of a Gogs user
     """
 
-    """
-    The user's id
-
-    :rtype: int
-    """
+    #: The user's id
+    #:
+    #: :rtype: int
     id = attr.ib()
+
     user_id = property(lambda self: self.id)
 
-    """
-    The user's username
-
-    :rtype: str
-    """
+    #: The user's username
+    #:
+    #: :rtype: str
     username = attr.ib()
 
-    """
-    The user's full name
-
-    :rtype: str
-    """
+    #: The user's full name
+    #:
+    #: :rtype: str
     full_name = attr.ib()
 
-    """
-    The user's email address. Can be empty as a result of invalid authentication
-
-    :rtype: str
-    """
+    #: The user's email address. Can be empty as a result of invalid authentication
+    #:
+    #: :rtype: str
     email = attr.ib(default=None)
 
-    """
-    The user's avatar URL
-
-    :rtype: str
-    """
+    #: The user's avatar URL
+    #:
+    #: :rtype: str
     avatar_url = attr.ib(default=None)
 
 
@@ -100,7 +93,7 @@ class GogsRepo(GogsEntity):
 
     :rtype: entities.GogsUser
     """
-    owner = attr.ib(convert=lambda parsed_json:GogsUser.from_json(parsed_json))
+    owner = attr.ib(convert=lambda parsed_json: GogsUser.from_json(parsed_json))
 
     """
     The full name of the repository
@@ -130,31 +123,30 @@ class GogsRepo(GogsEntity):
     """
     default_branch = attr.ib()
 
-    """
-    URLs of the repository
-
-    :rtype: GogsRepo.Urls
-    """
-    _ssh_url = attr.ib()
     _html_url = attr.ib()
     _clone_url = attr.ib()
+    _ssh_url = attr.ib()
+
+    #: URLs of the repository
+    #:
+    #: :rtype: GogsRepo.Urls
     @property
     def urls(self):
-        return GogsRepo.Urls(self._html_url, self._clone_url,self._ssh_url)
+        return GogsRepo.Urls(self._html_url, self._clone_url, self._ssh_url)
 
     """
     Permissions for the repository
 
     :rtype: GogsRepo.Permissions
     """
-    permissions = attr.ib(convert=lambda data:GogsRepo.Permissions.from_json(data))
+    permissions = attr.ib(convert=lambda data: GogsRepo.Permissions.from_json(data))
 
     """
     Gets the repository's parent, when a fork
 
     :rtype: GogsRepo
     """
-    parent = attr.ib(convert=lambda data:GogsRepo.from_json(data) if data else None, default=None)
+    parent = attr.ib(convert=lambda data: GogsRepo.from_json(data) if data else None, default=None)
 
     """
     Whether the repository is empty
@@ -357,6 +349,7 @@ class GogsOrg(GogsEntity):
     """
     location = attr.ib()
 
+
 @attr.s(frozen=True)
 class GogsTeam(GogsEntity):
     """
@@ -391,4 +384,3 @@ class GogsTeam(GogsEntity):
     :rtype: int
     """
     permission = attr.ib()
-
