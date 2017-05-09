@@ -335,6 +335,15 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 
+autodoc_member_order = 'bysource'
+
+import attr
+
+def process_signature(app, what, name, obj, options, signature,
+            return_annotation):
+    if isinstance(obj, attr._make.Attribute):
+        obj.__class__.__repr__ = lambda *a, **k: None
+
 def maybe_skip_member(app, what, name, obj, skip, options):
     # print (what, name, obj, skip)
     if type(obj) == property:
@@ -344,12 +353,14 @@ def maybe_skip_member(app, what, name, obj, skip, options):
         return False
     whitelisted_init_classes = ["GogsApi", "Token", "UsernamePassword", "Builder"]
     if name == "__init__":
-        return obj.im_class.__name__ not in whitelisted_init_classes
+        if hasattr(obj, 'im_class'):
+            return obj.im_class.__name__ not in whitelisted_init_classes
     blacklisted_names = ["update_kwargs"]
     return skip or (name in blacklisted_names)
 
 def setup(app):
     app.connect('autodoc-skip-member', maybe_skip_member)
+    app.connect('autodoc-process-signature', process_signature)
 
 def add_directive_header(self, sig):
     ModuleLevelDocumenter.add_directive_header(self, sig)
