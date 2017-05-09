@@ -2,6 +2,10 @@
 Various immutable classes that represent Gogs entities.
 """
 
+from collections import OrderedDict
+
+import attr
+
 
 def json_get(parsed_json, key):
     """
@@ -12,13 +16,11 @@ def json_get(parsed_json, key):
         raise ValueError("JSON does not contain a {} field".format(key))
     return parsed_json[key]
 
-import attr
-
-from collections import OrderedDict
 
 @attr.s
 class GogsEntity(object):
     json = attr.ib()
+
     @classmethod
     def from_json(cls, parsed_json):
         # with introspection, get arguments of the constructor
@@ -44,40 +46,37 @@ class GogsUser(GogsEntity):
      An immutable representation of a Gogs user
     """
 
-    """
-    The user's id
-
-    :rtype: int
-    """
+    #: The user's id
+    #:
+    #: :type: int
     id = attr.ib()
+
+    #: The user's id
+    #:
+    #: :type: int
+    #:
+    #: .. deprecated:: 1.1
+    #:    Use :data:`id` instead
     user_id = property(lambda self: self.id)
 
-    """
-    The user's username
-
-    :rtype: str
-    """
+    #: The user's username
+    #:
+    #: :type: str
     username = attr.ib()
 
-    """
-    The user's full name
-
-    :rtype: str
-    """
+    #: The user's full name
+    #:
+    #: :type: str
     full_name = attr.ib()
 
-    """
-    The user's email address. Can be empty as a result of invalid authentication
-
-    :rtype: str
-    """
+    #: The user's email address. Can be empty as a result of invalid authentication
+    #:
+    #: :type: str
     email = attr.ib(default=None)
 
-    """
-    The user's avatar URL
-
-    :rtype: str
-    """
+    #: The user's avatar URL
+    #:
+    #: :type: str
     avatar_url = attr.ib(default=None)
 
 
@@ -87,217 +86,192 @@ class GogsRepo(GogsEntity):
     An immutable representation of a Gogs repository
     """
 
-    """
-    The repository's id
-
-    :rtype: int
-    """
+    #: The repository's id
+    #:
+    #: :type: int
     id = attr.ib()
+
+    #: The repository's id
+    #:
+    #: :type: int
+    #:
+    #: .. deprecated:: 1.1
+    #:    Use :data:`id` instead
     repo_id = property(lambda self: self.id)
 
-    """
-    The owner of the repository
+    #: The owner of the repository
+    #:
+    #: :type: entities.GogsUser
+    owner = attr.ib(convert=lambda parsed_json: GogsUser.from_json(parsed_json))
 
-    :rtype: entities.GogsUser
-    """
-    owner = attr.ib(convert=lambda parsed_json:GogsUser.from_json(parsed_json))
-
-    """
-    The full name of the repository
-
-    :rtype: str
-    """
+    #: The full name of the repository
+    #:
+    #: :type: str
     full_name = attr.ib()
 
-    """
-    Whether the repository is private
-
-    :rtype: bool
-    """
+    #: Whether the repository is private
+    #:
+    #: :type: bool
     private = attr.ib()
 
-    """
-    Whether the repository is a fork
-
-    :rtype: bool
-    """
+    #: Whether the repository is a fork
+    #:
+    #: :type: bool
     fork = attr.ib()
 
-    """
-    The name of the default branch
-
-    :rtype: str
-    """
+    #: The name of the default branch
+    #:
+    #: :type: str
     default_branch = attr.ib()
 
-    """
-    URLs of the repository
-
-    :rtype: GogsRepo.Urls
-    """
-    _ssh_url = attr.ib()
     _html_url = attr.ib()
+    _ssh_url = attr.ib()
     _clone_url = attr.ib()
+
     @property
     def urls(self):
-        return GogsRepo.Urls(self._html_url, self._clone_url,self._ssh_url)
+        """
+        URLs of the repository
 
-    """
-    Permissions for the repository
+        :type: GogsRepo.Urls
+        """
+        return GogsRepo.Urls(self._html_url, self._clone_url, self._ssh_url)
 
-    :rtype: GogsRepo.Permissions
-    """
-    permissions = attr.ib(convert=lambda data:GogsRepo.Permissions.from_json(data))
+    #: Permissions for the repository
+    #:
+    #: :type: GogsRepo.Permissions
+    permissions = attr.ib(convert=lambda data: GogsRepo.Permissions.from_json(data))
 
-    """
-    Gets the repository's parent, when a fork
+    #: Gets the repository's parent, when a fork
+    #:
+    #: :type: GogsRepo
+    parent = attr.ib(convert=lambda data: GogsRepo.from_json(data) if data else None, default=None)
 
-    :rtype: GogsRepo
-    """
-    parent = attr.ib(convert=lambda data:GogsRepo.from_json(data) if data else None, default=None)
-
-    """
-    Whether the repository is empty
-
-    :rtype: bool
-    """
+    #: Whether the repository is empty
+    #:
+    #: :type: bool
     empty = attr.ib(default=None)
 
-    """
-    Size of the repository in kilobytes
-
-    :rtype: int
-    """
+    #: Size of the repository in kilobytes
+    #:
+    #: :type: int
     size = attr.ib(default=None)
 
     @attr.s(frozen=True)
     class Urls(object):
-        """
-        URL for the repository's webpage
-
-        :rtype: str
-        """
+        #: URL for the repository's webpage
+        #:
+        #: :type: str
         html_url = attr.ib()
 
-        """
-        URL for cloning the repository (via HTTP)
-
-        :rtype: str
-        """
+        #: URL for cloning the repository (via HTTP)
+        #:
+        #: :type: str
         clone_url = attr.ib()
 
-        """
-        URL for cloning the repository via SSH
-
-        :rtype: str
-        """
+        #: URL for cloning the repository via SSH
+        #:
+        #: :type: str
         ssh_url = attr.ib()
 
     @attr.s(frozen=True)
     class Permissions(GogsEntity):
-        """
-        Whether the user that requested this repository has admin permissions
-
-        :rtype: bool
-        """
+        #: Whether the user that requested this repository has admin permissions
+        #:
+        #: :type: bool
         admin = attr.ib(default=False)
 
-        """
-        Whether the user that requested this repository has push permissions
-
-        :rtype: bool
-        """
+        #: Whether the user that requested this repository has push permissions
+        #:
+        #: :type: bool
         push = attr.ib(default=False)
 
-        """
-        Whether the user that requested this repository has pull permissions
-
-        :rtype: bool
-        """
+        #: Whether the user that requested this repository has pull permissions
+        #:
+        #: :type: bool
         pull = attr.ib(default=False)
 
     @attr.s(frozen=True)
     class Hook(GogsEntity):
-        """
-        The hook's id number
-
-        :rtype: int
-        """
+        #: The hook's id number
+        #:
+        #: :type: int
         id = attr.ib()
+
+        #: The hook's id number
+        #:
+        #: :type: int
+        #:
+        #: .. deprecated:: 1.1
+        #:    Use :data:`id` instead
         hook_id = property(lambda self: self.id)
 
-        """
-        The hook's type (gogs, slack, etc.)
-
-        :rtype: str
-        """
+        #: The hook's type (gogs, slack, etc.)
+        #:
+        #: :type: str
         type = attr.ib()
+
+        #: The hook's type (gogs, slack, etc.)
+        #:
+        #: :type: str
+        #:
+        #: .. deprecated:: 1.1
+        #:    Use :data:`type` instead
         hook_type = property(lambda self: self.type)
 
-        """
-        The events that fire the hook
-
-        :rtype: List[str]
-        """
+        #: The events that fire the hook
+        #:
+        #: :type: List[str]
         events = attr.ib()
 
-        """
-        Whether the hook is active
-
-        :rtype: bool
-        """
+        #: Whether the hook is active
+        #:
+        #: :type: bool
         active = attr.ib()
 
-        """
-        Config of the hook. Possible keys include ``"content_type"``, ``"url"``, ``"secret"``
-
-        :rtype: dict
-        """
+        #: Config of the hook. Possible keys include ``"content_type"``, ``"url"``, ``"secret"``
+        #:
+        #: :type: dict
         config = attr.ib()
 
     @attr.s(frozen=True)
     class DeployKey(GogsEntity):
-        """
-        The key's id number
-
-        :rtype: int
-        """
+        #: The key's id number
+        #:
+        #: :type: int
         id = attr.ib()
+
+        #: The key's id number
+        #:
+        #: :type: int
+        #:
+        #: .. deprecated:: 1.1
+        #:    Use :data:`id` instead
         key_id = property(lambda self: self.id)
 
-        """
-        The content of the key
-
-        :rtype: str
-        """
+        #: The content of the key
+        #:
+        #: :type: str
         key = attr.ib()
 
-        """
-        URL where the key can be found
-
-        :rtype: str
-        """
+        #: URL where the key can be found
+        #:
+        #: :type: str
         url = attr.ib()
 
-        """
-        The name of the key
-
-        :rtype: str
-        """
+        #: The name of the key
+        #:
+        #: :type: str
         title = attr.ib()
 
-        """
-        Creation date of the key
-
-        :rtype: str
-        """
+        #: Creation date of the key
+        #:
+        #: :type: str
         created_at = attr.ib()
 
-        """
-        Whether key is read-only
-
-        :rtype: bool
-        """
+        #: Whether key is read-only
+        #:
+        #: :type: bool
         read_only = attr.ib()
 
 
@@ -307,55 +281,49 @@ class GogsOrg(GogsEntity):
      An immutable representation of a Gogs Organization
     """
 
-    """
-    The organization's id
-
-    :rtype: int
-    """
+    #: The organization's id
+    #:
+    #: :type: int
     id = attr.ib()
+
+    #: The organization's id
+    #:
+    #: :type: int
+    #:
+    #: .. deprecated:: 1.1
+    #:    Use :data:`id` instead
     org_id = property(lambda self: self.id)
 
-    """
-    Organization's username
-
-    :rtype: str
-    """
+    #: Organization's username
+    #:
+    #: :type: str
     username = attr.ib()
 
-    """
-    Organization's full name
-
-    :rtype: str
-    """
+    #: Organization's full name
+    #:
+    #: :type: str
     full_name = attr.ib()
 
-    """
-    Organization's avatar url
-
-    :rtype: str
-    """
+    #: Organization's avatar URL
+    #:
+    #: :type: str
     avatar_url = attr.ib()
 
-    """
-    Organization's description
-
-    :rtype: str
-    """
+    #: Organization's description
+    #:
+    #: :type: str
     description = attr.ib()
 
-    """
-    Organization's website address
-
-    :rtype: str
-    """
+    #: Organization's website address
+    #:
+    #: :type: str
     website = attr.ib()
 
-    """
-    Organization's location
-
-    :rtype: str
-    """
+    #: Organization's location
+    #:
+    #: :type: str
     location = attr.ib()
+
 
 @attr.s(frozen=True)
 class GogsTeam(GogsEntity):
@@ -363,32 +331,30 @@ class GogsTeam(GogsEntity):
     An immutable representation of a Gogs organization team
     """
 
-    """
-    Team's id
-
-    :rtype: int
-    """
+    #: Team's id
+    #:
+    #: :type: int
     id = attr.ib()
+
+    #: Team's id
+    #:
+    #: :type: int
+    #:
+    #: .. deprecated:: 1.1
+    #:    Use :data:`id` instead
     team_id = property(lambda self: self.id)
 
-    """
-    Team name
-
-    :rtype: str
-    """
+    #: Team name
+    #:
+    #: :type: str
     name = attr.ib()
 
-    """
-    Description of the team
-
-    :rtype: str
-    """
+    #: Description of the team
+    #:
+    #: :type: str
     description = attr.ib()
 
-    """
-    Team permission, can be read, write or admin, default is read
-
-    :rtype: int
-    """
+    #: Team permission, can be read, write or admin, default is read
+    #:
+    #: :type: int
     permission = attr.ib()
-
