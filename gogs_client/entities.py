@@ -354,7 +354,7 @@ class GogsTeam(GogsEntity):
     #: :type: str
     description = attr.ib()
 
-    #: Team permission, can be read, write or admin, default is read
+    #: Team permission, one of `"read"`, `"write"`, `"admin"`, `"owner"` or `"none"`
     #:
-    #: :type: int
+    #: :type: str
     permission = attr.ib()
