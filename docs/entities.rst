@@ -41,3 +41,9 @@ GogsTeam
 
 .. autoclass:: gogs_client.entities::GogsTeam()
     :members:
+
+GogsEntity
+----------
+
+.. autoclass:: gogs_client.entities::GogsEntity()
+    :members:
