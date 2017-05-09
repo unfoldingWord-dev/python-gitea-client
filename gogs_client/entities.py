@@ -278,7 +278,7 @@ class GogsRepo(GogsEntity):
 @attr.s(frozen=True)
 class GogsOrg(GogsEntity):
     """
-     An immutable representation of a Gogs Organization
+     An immutable representation of a Gogs organization
     """
 
     #: The organization's id
