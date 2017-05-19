@@ -39,31 +39,6 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "pull": true
                   }
                 }"""
-        self.branch_json_str = """{
-                "name": "master",
-                "commit": {
-                    "id": "c17825309a0d52201e78a19f49948bcc89e52488",
-                    "message": "migrated to RC0.2\n",
-                    "url": "Not implemented",
-                    "author": {
-                        "name": "Joel Lonbeck",
-                        "email": "joel@neutrinographics.com",
-                        "username": "joel"
-                    },
-                    "committer": {
-                        "name": "Joel Lonbeck",
-                        "email": "joel@neutrinographics.com",
-                        "username": "joel"
-                    },
-                    "verification": {
-                        "verified": false,
-                        "reason": "gpg.error.not_signed_commit",
-                        "signature": "",
-                        "payload": ""
-                    },
-                    "timestamp": "2017-05-17T21:11:25Z"
-                    }
-                }"""
         self.repos_list_json_str = """[{
                 "id": 27,
                 "owner": {
@@ -113,6 +88,80 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "pull": true
                   }
                 }]"""
+        self.branch_json_str = """{
+                        "name": "master",
+                        "commit": {
+                            "id": "c17825309a0d52201e78a19f49948bcc89e52488",
+                            "message": "migrated to RC0.2",
+                            "url": "Not implemented",
+                            "author": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "committer": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "verification": {
+                                "verified": false,
+                                "reason": "gpg.error.not_signed_commit",
+                                "signature": "",
+                                "payload": ""
+                            },
+                            "timestamp": "2017-05-17T21:11:25Z"
+                            }
+                        }"""
+        self.branches_list_json_str = """[{
+                        "name": "master",
+                        "commit": {
+                            "id": "c17825309a0d52201e78a19f49948bcc89e52488",
+                            "message": "migrated to RC0.2",
+                            "url": "Not implemented",
+                            "author": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "committer": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "verification": {
+                                "verified": false,
+                                "reason": "gpg.error.not_signed_commit",
+                                "signature": "",
+                                "payload": ""
+                            },
+                            "timestamp": "2017-05-17T21:11:25Z"
+                            }
+                        },{
+                        "name": "develop",
+                        "commit": {
+                            "id": "r03kd7cjr9a0d52201e78a19f49948bcc89e52488",
+                            "message": "another branch",
+                            "url": "Not implemented",
+                            "author": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "committer": {
+                                "name": "Joel Lonbeck",
+                                "email": "joel@neutrinographics.com",
+                                "username": "joel"
+                            },
+                            "verification": {
+                                "verified": false,
+                                "reason": "gpg.error.not_signed_commit",
+                                "signature": "",
+                                "payload": ""
+                            },
+                            "timestamp": "2017-05-17T21:11:25Z"
+                            }
+                        }]"""
         self.user_json_str = """{
                   "id": 1,
                   "username": "unknwon",
@@ -262,14 +311,6 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(last_call.request.url, self.path_with_token(uri2))
 
     @responses.activate
-    def test_get_branch1(self):
-        uri = self.path("/repos/username/repo/branches/branch")
-        responses.add(responses.GET, uri, body=self.branch_json_str, status=200)
-        branch = self.client.get_branch(self.token, "username", "branch")
-        self.assert_branches_equal(branch, self.expected_branch)
-
-
-    @responses.activate
     def test_get_user_repos(self):
         uri = self.path("/users/username/repos")
         responses.add(responses.GET, uri, body=self.repos_list_json_str, status=200)
@@ -291,6 +332,21 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(first_call.request.url, self.path_with_token(uri1))
         last_call = responses.calls[1]
         self.assertEqual(last_call.request.url, self.path_with_token(uri2))
+
+    @responses.activate
+    def test_get_branch(self):
+        uri = self.path("/repos/username/repo/branches/branch")
+        responses.add(responses.GET, uri, body=self.branch_json_str, status=200)
+        branch = self.client.get_branch(self.token, "username", "repo", "branch")
+        self.assert_branches_equal(branch, self.expected_branch)
+
+    @responses.activate
+    def test_get_branches(self):
+        uri = self.path("/repos/username/repo/branches")
+        responses.add(responses.GET, uri, body=self.branches_list_json_str, status=200)
+        branches = self.client.get_branches(self.token, "username", "repo")
+        self.assertEqual(len(branches), 2)
+        self.assert_branches_equal(branches[0], self.expected_branch)
 
     @responses.activate
     def test_create_user1(self):
