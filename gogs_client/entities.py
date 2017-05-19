@@ -274,6 +274,48 @@ class GogsRepo(GogsEntity):
         #: :type: bool
         read_only = attr.ib()
 
+@attr.s(frozen=True)
+class GogsBranch(GogsEntity):
+    """
+    An immutable representation of a Gogs branch
+    """
+
+    #: The branch's name
+    #:
+    #: :type: str
+    name = attr.ib()
+
+    #: The HEAD commit of the branch
+    #:
+    #: :type: entities.GogsCommit
+    commit = attr.ib(convert=lambda parsed_json: GogsCommit.from_json(parsed_json))
+
+@attr.s(frozen=True)
+class GogsCommit(GogsEntity):
+    """
+    An immutable representation of a Gogs commit
+    """
+
+    #: The commit's id
+    #:
+    #: :type: str
+    id = attr.ib()
+
+    #: The commit's message
+    #:
+    #: :type: str
+    message = attr.ib()
+
+    #: The commit's url
+    #:
+    #: :type: str
+    url = attr.ib()
+
+    #: The commit's timestamp
+    #:
+    #: :type: str
+    timestamp = attr.ib()
+
 
 @attr.s(frozen=True)
 class GogsOrg(GogsEntity):

@@ -39,6 +39,31 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "pull": true
                   }
                 }"""
+        self.branch_json_str = """{
+                "name": "master",
+                "commit": {
+                    "id": "c17825309a0d52201e78a19f49948bcc89e52488",
+                    "message": "migrated to RC0.2\n",
+                    "url": "Not implemented",
+                    "author": {
+                        "name": "Joel Lonbeck",
+                        "email": "joel@neutrinographics.com",
+                        "username": "joel"
+                    },
+                    "committer": {
+                        "name": "Joel Lonbeck",
+                        "email": "joel@neutrinographics.com",
+                        "username": "joel"
+                    },
+                    "verification": {
+                        "verified": false,
+                        "reason": "gpg.error.not_signed_commit",
+                        "signature": "",
+                        "payload": ""
+                    },
+                    "timestamp": "2017-05-17T21:11:25Z"
+                    }
+                }"""
         self.repos_list_json_str = """[{
                 "id": 27,
                 "owner": {
@@ -188,6 +213,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
               "read_only": true
             }]"""
         self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
+        self.expected_branch = gogs_client.GogsBranch.from_json(json.loads(self.branch_json_str))
         self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
         self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
         self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
@@ -234,6 +260,14 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(first_call.request.url, self.path_with_token(uri1))
         last_call = responses.calls[1]
         self.assertEqual(last_call.request.url, self.path_with_token(uri2))
+
+    @responses.activate
+    def test_get_branch1(self):
+        uri = self.path("/repos/username/repo/branches/branch")
+        responses.add(responses.GET, uri, body=self.branch_json_str, status=200)
+        branch = self.client.get_branch(self.token, "username", "branch")
+        self.assert_branches_equal(branch, self.expected_branch)
+
 
     @responses.activate
     def test_get_user_repos(self):
@@ -600,6 +634,16 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.assertEqual(repo.permissions.admin, expected.permissions.admin)
         self.assertEqual(repo.permissions.push, expected.permissions.push)
         self.assertEqual(repo.permissions.pull, expected.permissions.pull)
+
+    def assert_branches_equal(self, branch, expected):
+        self.assertEqual(branch.name, expected.name)
+        self.assert_commits_equal(branch.commit, expected.commit)
+
+    def assert_commits_equal(self, commit, expected):
+        self.assertEqual(commit.id, expected.id)
+        self.assertEqual(commit.message, expected.message)
+        self.assertEqual(commit.url, expected.url)
+        self.assertEqual(commit.timestamp, expected.timestamp)
 
     def assert_users_equals(self, user, expected):
         self.assertEqual(user.id, expected.id)

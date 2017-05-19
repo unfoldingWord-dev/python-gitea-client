@@ -194,6 +194,24 @@ class GogsApi(object):
         response = self._check_ok(self._get(path, auth=auth))
         return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
 
+    def get_branch(self, auth, username, repo_name, branch_name):
+        """
+        Returns the branch with name ``branch_name`` in the repository with name ``repo_name``
+        owned by the user with username ``username``.
+        
+        :param auth.Authentication auth: authentication object 
+        :param str username: username of owner of repository containing the branch
+        :param str repo_name: name of the repository with the branch
+        :param str branch_name: name of the branch to return
+        :return a branch
+        :rtype: GogsBranch
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{u}/{r}/branches/{b}".format(u=username, r=repo_name, b=branch_name)
+        response = self._check_ok(self._get(path, auth=auth))
+        return GogsBranch.from_json(response.json())
+
     def delete_repo(self, auth, username, repo_name):
         """
         Deletes the repository with name ``repo_name`` owned by the user with username ``username``.
