@@ -104,6 +104,11 @@ class GogsRepo(GogsEntity):
     #: :type: entities.GogsUser
     owner = attr.ib(convert=lambda parsed_json: GogsUser.from_json(parsed_json))
 
+    #: The name of the repository
+    #:
+    #: :type: str
+    name = attr.ib()
+
     #: The full name of the repository
     #:
     #: :type: str
@@ -146,6 +151,11 @@ class GogsRepo(GogsEntity):
     #:
     #: :type: GogsRepo
     parent = attr.ib(convert=lambda data: GogsRepo.from_json(data) if data else None, default=None)
+
+    #: The description of the repository
+    #:
+    #: :type: str
+    description = attr.ib(default=None)
 
     #: Whether the repository is empty
     #:

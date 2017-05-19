@@ -23,7 +23,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "email": "u@gogs.io",
                     "avatar_url": "/avatars/1"
                   },
+                  "name": "Hello-World",
                   "full_name": "unknwon/Hello-World",
+                  "description": "Some description",
                   "private": false,
                   "fork": false,
                   "parent": null,
@@ -48,7 +50,9 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "email": "u@gogs.io",
                     "avatar_url": "/avatars/1"
                   },
+                  "name": "Hello-World",
                   "full_name": "unknwon/Hello-World",
+                  "description": "Some description",
                   "private": false,
                   "fork": false,
                   "parent": null,
@@ -72,6 +76,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "email": "u@gogs.io",
                     "avatar_url": "/avatars/1"
                   },
+                  "name": "Hello-World-Again",
                   "full_name": "unknwon/Hello-World-Again",
                   "private": false,
                   "fork": false,
