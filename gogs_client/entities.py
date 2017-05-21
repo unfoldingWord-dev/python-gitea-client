@@ -104,6 +104,11 @@ class GogsRepo(GogsEntity):
     #: :type: entities.GogsUser
     owner = attr.ib(convert=lambda parsed_json: GogsUser.from_json(parsed_json))
 
+    #: The name of the repository
+    #:
+    #: :type: str
+    name = attr.ib()
+
     #: The full name of the repository
     #:
     #: :type: str
@@ -146,6 +151,11 @@ class GogsRepo(GogsEntity):
     #:
     #: :type: GogsRepo
     parent = attr.ib(convert=lambda data: GogsRepo.from_json(data) if data else None, default=None)
+
+    #: The description of the repository
+    #:
+    #: :type: str
+    description = attr.ib(default=None)
 
     #: Whether the repository is empty
     #:
@@ -273,6 +283,48 @@ class GogsRepo(GogsEntity):
         #:
         #: :type: bool
         read_only = attr.ib()
+
+@attr.s(frozen=True)
+class GogsBranch(GogsEntity):
+    """
+    An immutable representation of a Gogs branch
+    """
+
+    #: The branch's name
+    #:
+    #: :type: str
+    name = attr.ib()
+
+    #: The HEAD commit of the branch
+    #:
+    #: :type: entities.GogsCommit
+    commit = attr.ib(convert=lambda parsed_json: GogsCommit.from_json(parsed_json))
+
+@attr.s(frozen=True)
+class GogsCommit(GogsEntity):
+    """
+    An immutable representation of a Gogs commit
+    """
+
+    #: The commit's id
+    #:
+    #: :type: str
+    id = attr.ib()
+
+    #: The commit's message
+    #:
+    #: :type: str
+    message = attr.ib()
+
+    #: The commit's url
+    #:
+    #: :type: str
+    url = attr.ib()
+
+    #: The commit's timestamp
+    #:
+    #: :type: str
+    timestamp = attr.ib()
 
 
 @attr.s(frozen=True)

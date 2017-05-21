@@ -2,7 +2,7 @@ import requests
 
 from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
 from gogs_client.auth import Token
-from gogs_client.entities import GogsUser, GogsRepo, GogsOrg, GogsTeam
+from gogs_client.entities import GogsUser, GogsRepo, GogsBranch, GogsOrg, GogsTeam
 
 
 class GogsApi(object):
@@ -193,6 +193,40 @@ class GogsApi(object):
         path = "/users/{u}/repos".format(u=username)
         response = self._check_ok(self._get(path, auth=auth))
         return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
+
+    def get_branch(self, auth, username, repo_name, branch_name):
+        """
+        Returns the branch with name ``branch_name`` in the repository with name ``repo_name``
+        owned by the user with username ``username``.
+        
+        :param auth.Authentication auth: authentication object 
+        :param str username: username of owner of repository containing the branch
+        :param str repo_name: name of the repository with the branch
+        :param str branch_name: name of the branch to return
+        :return a branch
+        :rtype: GogsBranch
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{u}/{r}/branches/{b}".format(u=username, r=repo_name, b=branch_name)
+        response = self._check_ok(self._get(path, auth=auth))
+        return GogsBranch.from_json(response.json())
+
+    def get_branches(self, auth, username, repo_name):
+        """
+        Returns the branches in the repository with name ``repo_name`` owned by the user with username ``username``.
+
+        :param auth.Authentication auth: authentication object 
+        :param str username: username of owner of repository containing the branch
+        :param str repo_name: name of the repository with the branch
+        :return a list of branches
+        :rtype: List[GogsBranch]
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        path = "/repos/{u}/{r}/branches".format(u=username, r=repo_name)
+        response = self._check_ok(self._get(path, auth=auth))
+        return [GogsBranch.from_json(branch_json) for branch_json in response.json()]
 
     def delete_repo(self, auth, username, repo_name):
         """
