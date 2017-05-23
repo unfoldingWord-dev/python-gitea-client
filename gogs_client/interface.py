@@ -198,12 +198,12 @@ class GogsApi(object):
         """
         Returns the branch with name ``branch_name`` in the repository with name ``repo_name``
         owned by the user with username ``username``.
-        
+
         :param auth.Authentication auth: authentication object 
         :param str username: username of owner of repository containing the branch
         :param str repo_name: name of the repository with the branch
         :param str branch_name: name of the branch to return
-        :return a branch
+        :return: a branch
         :rtype: GogsBranch
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -214,12 +214,13 @@ class GogsApi(object):
 
     def get_branches(self, auth, username, repo_name):
         """
-        Returns the branches in the repository with name ``repo_name`` owned by the user with username ``username``.
+        Returns the branches in the repository with name ``repo_name`` owned by the user
+        with username ``username``.
 
         :param auth.Authentication auth: authentication object 
         :param str username: username of owner of repository containing the branch
         :param str repo_name: name of the repository with the branch
-        :return a list of branches
+        :return: a list of branches
         :rtype: List[GogsBranch]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced

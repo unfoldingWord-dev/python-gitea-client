@@ -41,3 +41,15 @@ GogsTeam
 
 .. autoclass:: gogs_client.entities::GogsTeam()
     :members:
+
+GogsBranch
+----------
+
+.. autoclass:: gogs_client.entities::GogsBranch()
+    :members:
+
+GogsCommit
+----------
+
+.. autoclass:: gogs_client.entities::GogsCommit()
+    :members:

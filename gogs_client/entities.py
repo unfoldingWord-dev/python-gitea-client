@@ -101,7 +101,7 @@ class GogsRepo(GogsEntity):
 
     #: The owner of the repository
     #:
-    #: :type: entities.GogsUser
+    #: :type: :class:`~GogsUser`
     owner = attr.ib(convert=lambda parsed_json: GogsUser.from_json(parsed_json))
 
     #: The name of the repository
@@ -138,18 +138,18 @@ class GogsRepo(GogsEntity):
         """
         URLs of the repository
 
-        :type: GogsRepo.Urls
+        :type: :class:`~GogsRepo.Urls`
         """
         return GogsRepo.Urls(self._html_url, self._clone_url, self._ssh_url)
 
     #: Permissions for the repository
     #:
-    #: :type: GogsRepo.Permissions
+    #: :type: :class:`~GogsRepo.Permissions`
     permissions = attr.ib(convert=lambda data: GogsRepo.Permissions.from_json(data))
 
     #: Gets the repository's parent, when a fork
     #:
-    #: :type: GogsRepo
+    #: :type: :class:`~GogsRepo`
     parent = attr.ib(convert=lambda data: GogsRepo.from_json(data) if data else None, default=None)
 
     #: The description of the repository
@@ -298,7 +298,7 @@ class GogsBranch(GogsEntity):
 
     #: The HEAD commit of the branch
     #:
-    #: :type: entities.GogsCommit
+    #: :type: :class:`~GogsCommit`
     commit = attr.ib(convert=lambda parsed_json: GogsCommit.from_json(parsed_json))
 
 
