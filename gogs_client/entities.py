@@ -284,6 +284,7 @@ class GogsRepo(GogsEntity):
         #: :type: bool
         read_only = attr.ib()
 
+
 @attr.s(frozen=True)
 class GogsBranch(GogsEntity):
     """
@@ -299,6 +300,7 @@ class GogsBranch(GogsEntity):
     #:
     #: :type: entities.GogsCommit
     commit = attr.ib(convert=lambda parsed_json: GogsCommit.from_json(parsed_json))
+
 
 @attr.s(frozen=True)
 class GogsCommit(GogsEntity):

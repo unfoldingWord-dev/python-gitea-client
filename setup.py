@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-here = path.abspath(path.dirname(__file__))
+from setuptools import setup, find_packages
 
+here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, "README.rst"), "r") as f:
     long_description = f.read()

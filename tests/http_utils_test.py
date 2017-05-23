@@ -4,7 +4,6 @@ import gogs_client._implementation.http_utils as http_utils
 
 
 class HttpUtilsTest(unittest.TestCase):
-
     def test_append_url1(self):
         base = "https://www.google.com/"
         path = "/images/"
@@ -39,6 +38,7 @@ class HttpUtilsTest(unittest.TestCase):
         requestor = http_utils.RelativeHttpRequestor(base)
         self.assertEqual(requestor.absolute_url(path),
                          "https://hello.org/dir1/dir2/dir3/file.txt")
+
 
 if __name__ == "__main__":
     unittest.main()

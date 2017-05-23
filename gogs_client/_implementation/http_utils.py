@@ -11,6 +11,7 @@ class RelativeHttpRequestor(object):
     A thin wrapper around the requests module that allows for endpoint paths
     to be given relative to a fixed base URL
     """
+
     def __init__(self, base_url, session=None):
         self.base_url = base_url
         self.session = session or requests.Session()
