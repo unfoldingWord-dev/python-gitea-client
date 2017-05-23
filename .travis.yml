@@ -5,11 +5,13 @@ python:
 - '3.4'
 - '3.5'
 install:
-- pip install -r requirements.txt
-- pip install -r test_requirements.txt
-- pip install coveralls
+- virtualenv var
+- var/bin/pip install -U pip
+- var/bin/pip install -r requirements.txt
+- var/bin/pip install -r test_requirements.txt
+- var/bin/pip install coveralls pytest pytest-cov
 script:
-  coverage run --source=gogs_client setup.py test
+  var/bin/coverage run --source=gogs_client var/bin/pytest tests --cov=gogs_client --cov-report term-missing
 after_success:
   coveralls
 deploy:
