@@ -41,8 +41,8 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        response = self._get("/user", auth=auth)
-        return GogsUser.from_json(self._check_ok(response).json())
+        response = self.get("/user", auth=auth)
+        return GogsUser.from_json(response.json())
 
     def get_tokens(self, auth, username=None):
         """
@@ -61,8 +61,8 @@ class GogsApi(object):
         """
         if username is None:
             username = self.authenticated_user(auth).username
-        response = self._get("/users/{u}/tokens".format(u=username), auth=auth)
-        return [Token.from_json(o) for o in self._check_ok(response).json()]
+        response = self.get("/users/{u}/tokens".format(u=username), auth=auth)
+        return [Token.from_json(o) for o in response.json()]
 
     def create_token(self, auth, name, username=None):
         """
@@ -83,8 +83,8 @@ class GogsApi(object):
         if username is None:
             username = self.authenticated_user(auth).username
         data = {"name": name}
-        response = self._post("/users/{u}/tokens".format(u=username), auth=auth, data=data)
-        return Token.from_json(self._check_ok(response).json())
+        response = self.post("/users/{u}/tokens".format(u=username), auth=auth, data=data)
+        return Token.from_json(response.json())
 
     def ensure_token(self, auth, name, username=None):
         """
@@ -143,8 +143,8 @@ class GogsApi(object):
         }
         data = {k: v for (k, v) in data.items() if v is not None}
         url = "/org/{0}/repos".format(organization) if organization else "/user/repos"
-        response = self._post(url, auth=auth, data=data)
-        return GogsRepo.from_json(self._check_ok(response).json())
+        response = self.post(url, auth=auth, data=data)
+        return GogsRepo.from_json(response.json())
 
     def repo_exists(self, auth, username, repo_name):
         """
@@ -175,7 +175,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}".format(u=username, r=repo_name)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return GogsRepo.from_json(response.json())
 
     def get_user_repos(self, auth, username):
@@ -191,7 +191,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/users/{u}/repos".format(u=username)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
 
     def get_branch(self, auth, username, repo_name, branch_name):
@@ -209,7 +209,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/branches/{b}".format(u=username, r=repo_name, b=branch_name)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return GogsBranch.from_json(response.json())
 
     def get_branches(self, auth, username, repo_name):
@@ -226,7 +226,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/branches".format(u=username, r=repo_name)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return [GogsBranch.from_json(branch_json) for branch_json in response.json()]
 
     def delete_repo(self, auth, username, repo_name):
@@ -240,7 +240,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}".format(u=username, r=repo_name)
-        self._check_ok(self._delete(path, auth=auth))
+        self.delete(path, auth=auth)
 
     def migrate_repo(self, auth, clone_addr,
                      uid, repo_name, auth_username=None, auth_password=None,
@@ -273,8 +273,8 @@ class GogsApi(object):
         }
         data = {k: v for (k, v) in data.items() if v is not None}
         url = "/repos/migrate"
-        response = self._post(url, auth=auth, data=data)
-        return GogsRepo.from_json(self._check_ok(response).json())
+        response = self.post(url, auth=auth, data=data)
+        return GogsRepo.from_json(response.json())
 
     def create_user(self, auth, login_name, username, email, password, send_notify=False):
         """
@@ -300,8 +300,7 @@ class GogsApi(object):
             "password": password,
             "send_notify": send_notify
         }
-        response = self._post("/admin/users", auth=auth, data=data)
-        self._check_ok(response)
+        response = self.post("/admin/users", auth=auth, data=data)
         return GogsUser.from_json(response.json())
 
     def user_exists(self, username):
@@ -330,7 +329,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         params = {"q": username_keyword, "limit": limit}
-        response = self._check_ok(self._get("/users/search", params=params))
+        response = self.get("/users/search", params=params)
         return [GogsUser.from_json(user_json) for user_json in response.json()["data"]]
 
     def get_user(self, auth, username):
@@ -345,7 +344,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/users/{}".format(username)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return GogsUser.from_json(response.json())
 
     def update_user(self, auth, username, update):
@@ -361,7 +360,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/admin/users/{}".format(username)
-        response = self._check_ok(self._patch(path, auth=auth, data=update.as_dict()))
+        response = self.patch(path, auth=auth, data=update.as_dict())
         return GogsUser.from_json(response.json())
 
     def delete_user(self, auth, username):
@@ -373,7 +372,7 @@ class GogsApi(object):
         :param str username: username of user to delete
         """
         path = "/admin/users/{}".format(username)
-        self._check_ok(self._delete(path, auth=auth))
+        self.delete(path, auth=auth)
 
     def get_repo_hooks(self, auth, username, repo_name):
         """
@@ -389,7 +388,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/hooks".format(u=username, r=repo_name)
-        response = self._check_ok(self._get(path, auth=auth))
+        response = self.get(path, auth=auth)
         return [GogsRepo.Hook.from_json(hook) for hook in response.json()]
 
     def create_hook(self, auth, repo_name, hook_type, config, events=None, organization=None, active=False):
@@ -421,8 +420,7 @@ class GogsApi(object):
 
         url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization is not None \
             else "/repos/{r}/hooks".format(r=repo_name)
-        response = self._post(url, auth=auth, data=data)
-        self._check_ok(response)
+        response = self.post(url, auth=auth, data=data)
         return GogsRepo.Hook.from_json(response.json())
 
     def update_hook(self, auth, repo_name, hook_id, update, organization=None):
@@ -443,7 +441,7 @@ class GogsApi(object):
             path = "/repos/{o}/{r}/hooks/{i}".format(o=organization, r=repo_name, i=hook_id)
         else:
             path = "/repos/{r}/hooks/{i}".format(r=repo_name, i=hook_id)
-        response = self._check_ok(self._patch(path, auth=auth, data=update.as_dict()))
+        response = self._patch(path, auth=auth, data=update.as_dict())
         return GogsRepo.Hook.from_json(response.json())
 
     def delete_hook(self, auth, username, repo_name, hook_id):
@@ -459,7 +457,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/hooks/{i}".format(u=username, r=repo_name, i=hook_id)
-        self._check_ok(self._delete(path, auth=auth))
+        self.delete(path, auth=auth)
 
     def create_organization(self, auth, owner_name, org_name, full_name=None, description=None,
                             website=None, location=None):
@@ -487,8 +485,7 @@ class GogsApi(object):
         }
 
         url = "/admin/users/{u}/orgs".format(u=owner_name)
-        response = self._post(url, auth=auth, data=data)
-        self._check_ok(response)
+        response = self.post(url, auth=auth, data=data)
         return GogsOrg.from_json(response.json())
 
     def create_organization_team(self, auth, org_name, name, description=None, permission="read"):
@@ -512,8 +509,7 @@ class GogsApi(object):
         }
 
         url = "/admin/orgs/{o}/teams".format(o=org_name)
-        response = self._post(url, auth=auth, data=data)
-        self._check_ok(response)
+        response = self.post(url, auth=auth, data=data)
         return GogsTeam.from_json(response.json())
 
     def add_team_membership(self, auth, team_id, username):
@@ -527,7 +523,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username)
-        self._check_ok(self._put(url, auth=auth))
+        self.put(url, auth=auth)
 
     def remove_team_membership(self, auth, team_id, username):
         """
@@ -540,7 +536,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/members/{u}".format(t=team_id, u=username)
-        self._check_ok(self._delete(url, auth=auth))
+        self.delete(url, auth=auth)
 
     def add_repo_to_team(self, auth, team_id, repo_name):
         """
@@ -553,7 +549,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name)
-        self._check_ok(self._put(url, auth=auth))
+        self.put(url, auth=auth)
 
     def remove_repo_from_team(self, auth, team_id, repo_name):
         """
@@ -566,7 +562,7 @@ class GogsApi(object):
         :raises ApiFailure: if the request cannot be serviced
         """
         url = "/admin/teams/{t}/repos/{r}".format(t=team_id, r=repo_name)
-        self._check_ok(self._delete(url, auth=auth))
+        self.delete(url, auth=auth)
 
     def list_deploy_keys(self, auth, username, repo_name):
         """
@@ -580,7 +576,7 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        response = self._check_ok(self._get("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth))
+        response = self.get("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth)
         return [GogsRepo.DeployKey.from_json(key_json) for key_json in response.json()]
 
     def get_deploy_key(self, auth, username, repo_name, key_id):
@@ -596,8 +592,7 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        response = self._check_ok(
-            self._get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
+        response = self.get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth)
         return GogsRepo.DeployKey.from_json(response.json())
 
     def add_deploy_key(self, auth, username, repo_name, title, key_content):
@@ -618,8 +613,7 @@ class GogsApi(object):
             "title": title,
             "key": key_content
         }
-        response = self._check_ok(
-            self._post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data))
+        response = self.post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data)
         return GogsRepo.DeployKey.from_json(response.json())
 
     def delete_deploy_key(self, auth, username, repo_name, key_id):
@@ -633,9 +627,7 @@ class GogsApi(object):
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
-        response = self._check_ok(
-            self._delete("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth))
-        self._check_ok(response)
+        self.delete("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth)
 
     # Helper methods
 
@@ -647,6 +639,19 @@ class GogsApi(object):
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
 
+    def delete(self, path, auth=None, **kwargs):
+        """
+        Manually make a DELETE request.
+
+        :param str path: relative url of the request (e.g. `/users/username`)
+        :param auth.Authentication auth: authentication object
+        :param kwargs dict: Extra arguments for the request, as supported by
+                            `requests <http://docs.python-requests.org/>`_ library.
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        return self._check_ok(self._delete(path, auth=auth, **kwargs))
+
     def _get(self, path, auth=None, **kwargs):
         if auth is not None:
             auth.update_kwargs(kwargs)
@@ -654,6 +659,19 @@ class GogsApi(object):
             return self._requestor.get(path, **kwargs)
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
+
+    def get(self, path, auth=None, **kwargs):
+        """
+        Manually make a GET request.
+
+        :param str path: relative url of the request (e.g. `/users/username`)
+        :param auth.Authentication auth: authentication object
+        :param kwargs dict: Extra arguments for the request, as supported by
+                            `requests <http://docs.python-requests.org/>`_ library.
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        return self._check_ok(self._get(path, auth=auth, **kwargs))
 
     def _patch(self, path, auth=None, **kwargs):
         if auth is not None:
@@ -663,6 +681,19 @@ class GogsApi(object):
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
 
+    def patch(self, path, auth=None, **kwargs):
+        """
+        Manually make a PATCH request.
+
+        :param str path: relative url of the request (e.g. `/users/username`)
+        :param auth.Authentication auth: authentication object
+        :param kwargs dict: Extra arguments for the request, as supported by
+                            `requests <http://docs.python-requests.org/>`_ library.
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        return self._check_ok(self._patch(path, auth=auth, **kwargs))
+
     def _post(self, path, auth=None, **kwargs):
         if auth is not None:
             auth.update_kwargs(kwargs)
@@ -671,6 +702,19 @@ class GogsApi(object):
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
 
+    def post(self, path, auth=None, **kwargs):
+        """
+        Manually make a POST request.
+
+        :param str path: relative url of the request (e.g. `/users/username`)
+        :param auth.Authentication auth: authentication object
+        :param kwargs dict: Extra arguments for the request, as supported by
+                            `requests <http://docs.python-requests.org/>`_ library.
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        return self._check_ok(self._post(path, auth=auth, **kwargs))
+
     def _put(self, path, auth=None, **kwargs):
         if auth is not None:
             auth.update_kwargs(kwargs)
@@ -678,6 +722,19 @@ class GogsApi(object):
             return self._requestor.put(path, **kwargs)
         except requests.RequestException as exc:
             raise NetworkFailure(exc)
+
+    def put(self, path, auth=None, **kwargs):
+        """
+        Manually make a PUT request.
+
+        :param str path: relative url of the request (e.g. `/users/username`)
+        :param auth.Authentication auth: authentication object
+        :param kwargs dict: Extra arguments for the request, as supported by
+                            `requests <http://docs.python-requests.org/>`_ library.
+        :raises NetworkFailure: if there is an error communicating with the server
+        :raises ApiFailure: if the request cannot be serviced
+        """
+        return self._check_ok(self._put(path, auth=auth, **kwargs))
 
     @staticmethod
     def _check_ok(response):
