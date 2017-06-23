@@ -645,7 +645,7 @@ class GogsApi(object):
 
         :param str path: relative url of the request (e.g. `/users/username`)
         :param auth.Authentication auth: authentication object
-        :param kwargs dict: Extra arguments for the request, as supported by
+        :param kwargs dict: Extra arguments for the request, as supported by the
                             `requests <http://docs.python-requests.org/>`_ library.
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -666,7 +666,7 @@ class GogsApi(object):
 
         :param str path: relative url of the request (e.g. `/users/username`)
         :param auth.Authentication auth: authentication object
-        :param kwargs dict: Extra arguments for the request, as supported by
+        :param kwargs dict: Extra arguments for the request, as supported by the
                             `requests <http://docs.python-requests.org/>`_ library.
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -687,7 +687,7 @@ class GogsApi(object):
 
         :param str path: relative url of the request (e.g. `/users/username`)
         :param auth.Authentication auth: authentication object
-        :param kwargs dict: Extra arguments for the request, as supported by
+        :param kwargs dict: Extra arguments for the request, as supported by the
                             `requests <http://docs.python-requests.org/>`_ library.
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -708,7 +708,7 @@ class GogsApi(object):
 
         :param str path: relative url of the request (e.g. `/users/username`)
         :param auth.Authentication auth: authentication object
-        :param kwargs dict: Extra arguments for the request, as supported by
+        :param kwargs dict: Extra arguments for the request, as supported by the
                             `requests <http://docs.python-requests.org/>`_ library.
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
@@ -729,7 +729,7 @@ class GogsApi(object):
 
         :param str path: relative url of the request (e.g. `/users/username`)
         :param auth.Authentication auth: authentication object
-        :param kwargs dict: Extra arguments for the request, as supported by
+        :param kwargs dict: Extra arguments for the request, as supported by the
                             `requests <http://docs.python-requests.org/>`_ library.
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
