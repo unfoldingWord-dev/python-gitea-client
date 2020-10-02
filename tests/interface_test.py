@@ -5,15 +5,15 @@ import unittest
 import responses
 from future.moves.urllib.parse import parse_qs
 
-import gogs_client
-import gogs_client._implementation.http_utils as http_utils
+import gitea_client
+import gitea_client._implementation.http_utils as http_utils
 
 
 class GogsClientInterfaceTest(unittest.TestCase):
     def setUp(self):
         self.api_endpoint = "https://www.example.com/api/v1/"
         self.base_url = "https://www.example.com/"
-        self.client = gogs_client.GogsApi(self.base_url)
+        self.client = gitea_client.GogsApi(self.base_url)
         self.repo_json_str = """{
                 "id": 27,
                 "owner": {
@@ -178,7 +178,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "name": "new token",
                   "sha1": "mytoken"
                 }"""
-        self.username_password = gogs_client.UsernamePassword(
+        self.username_password = gitea_client.UsernamePassword(
             "auth_username", "password")
         self.hook_json_str = """{
                 "id": 4,
@@ -266,14 +266,14 @@ class GogsClientInterfaceTest(unittest.TestCase):
               "created_at": "2015-11-18T15:05:43-05:00",
               "read_only": true
             }]"""
-        self.expected_repo = gogs_client.GogsRepo.from_json(json.loads(self.repo_json_str))
-        self.expected_branch = gogs_client.GogsBranch.from_json(json.loads(self.branch_json_str))
-        self.expected_user = gogs_client.GogsUser.from_json(json.loads(self.user_json_str))
-        self.expected_hook = gogs_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
-        self.expected_org = gogs_client.GogsOrg.from_json(json.loads(self.org_json_str))
-        self.expected_team = gogs_client.GogsTeam.from_json(json.loads(self.team_json_str))
-        self.expected_key = gogs_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
-        self.token = gogs_client.Token.from_json(json.loads(self.token_json_str))
+        self.expected_repo = gitea_client.GogsRepo.from_json(json.loads(self.repo_json_str))
+        self.expected_branch = gitea_client.GogsBranch.from_json(json.loads(self.branch_json_str))
+        self.expected_user = gitea_client.GogsUser.from_json(json.loads(self.user_json_str))
+        self.expected_hook = gitea_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
+        self.expected_org = gitea_client.GogsOrg.from_json(json.loads(self.org_json_str))
+        self.expected_team = gitea_client.GogsTeam.from_json(json.loads(self.team_json_str))
+        self.expected_key = gitea_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
+        self.token = gitea_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
     def test_create_repo1(self):
@@ -307,7 +307,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.GET, uri2, status=404)
         repo = self.client.get_repo(self.token, "username", "repo1")
         self.assert_repos_equal(repo, self.expected_repo)
-        self.assertRaises(gogs_client.ApiFailure, self.client.get_repo,
+        self.assertRaises(gitea_client.ApiFailure, self.client.get_repo,
                           self.token, "username", "repo2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
@@ -330,7 +330,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.DELETE, uri1, status=204)
         responses.add(responses.DELETE, uri2, status=401)
         self.client.delete_repo(self.token, "username", "repo1")
-        self.assertRaises(gogs_client.ApiFailure, self.client.delete_repo,
+        self.assertRaises(gitea_client.ApiFailure, self.client.delete_repo,
                           self.token, "otherusername", "repo2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
@@ -409,7 +409,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         try:
             self.client.get_user(None, "username2")
             raise AssertionError("Call to get_user did not raise an exception")
-        except gogs_client.ApiFailure as exc:
+        except gitea_client.ApiFailure as exc:
             self.assertIsNotNone(exc.message)
             self.assertEqual(exc.status_code, 404)
         self.assertEqual(len(responses.calls), 2)
@@ -420,7 +420,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_user1(self):
-        update = gogs_client.GogsUserUpdate.Builder("loginname", "user@example.com") \
+        update = gitea_client.GogsUserUpdate.Builder("loginname", "user@example.com") \
             .set_full_name("Example User") \
             .set_password("Password") \
             .set_website("mywebsite.net") \
@@ -456,7 +456,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.DELETE, uri1, status=204)
         responses.add(responses.DELETE, uri2, status=401)
         self.client.delete_user(self.username_password, "username1")
-        self.assertRaises(gogs_client.ApiFailure, self.client.delete_user,
+        self.assertRaises(gitea_client.ApiFailure, self.client.delete_user,
                           self.username_password, "username2")
         self.assertEqual(len(responses.calls), 2)
         first_call = responses.calls[0]
@@ -469,8 +469,8 @@ class GogsClientInterfaceTest(unittest.TestCase):
     @responses.activate
     def test_valid_authentication1(self):
         uri = self.path("/user")
-        valid_token = gogs_client.Token("a_valid_token")
-        invalid_token = gogs_client.Token("an_invalid_token")
+        valid_token = gitea_client.Token("a_valid_token")
+        invalid_token = gitea_client.Token("an_invalid_token")
 
         def callback(request):
             if request.url == self.path_with_token(uri, valid_token):
@@ -537,7 +537,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_hook1(self):
-        update = gogs_client.GogsHookUpdate.Builder() \
+        update = gitea_client.GogsHookUpdate.Builder() \
             .set_events(["issues_comments"]) \
             .set_config({"url": "http://newurl.com/hook"}) \
             .set_active(True) \

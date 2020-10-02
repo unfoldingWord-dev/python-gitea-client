@@ -1,7 +1,7 @@
 """
 Various classes for Gogs authentication
 """
-from gogs_client.entities import json_get
+from gitea_client.entities import json_get
 
 
 class Authentication(object):

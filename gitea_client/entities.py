@@ -216,7 +216,7 @@ class GogsRepo(GogsEntity):
         #:    Use :data:`id` instead
         hook_id = property(lambda self: self.id)
 
-        #: The hook's type (gogs, slack, etc.)
+        #: The hook's type (gitea, gogs, slack, etc.)
         #:
         #: :type: str
         type = attr.ib()

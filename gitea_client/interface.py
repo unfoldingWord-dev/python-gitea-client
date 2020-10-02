@@ -1,8 +1,8 @@
 import requests
 
-from gogs_client._implementation.http_utils import RelativeHttpRequestor, append_url
-from gogs_client.auth import Token
-from gogs_client.entities import GogsUser, GogsRepo, GogsBranch, GogsOrg, GogsTeam
+from gitea_client._implementation.http_utils import RelativeHttpRequestor, append_url
+from gitea_client.auth import Token
+from gitea_client.entities import GogsUser, GogsRepo, GogsBranch, GogsOrg, GogsTeam
 
 
 class GogsApi(object):
@@ -397,7 +397,7 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str repo_name: the name of the repo for which we create the hook
-        :param str hook_type: The type of webhook, either "gogs" or "slack"
+        :param str hook_type: The type of webhook, either "gitea", "gogs" or "slack"
         :param dict config: Settings for this hook (possible keys are
                             ``"url"``, ``"content_type"``, ``"secret"``)
         :param list events: Determines what events the hook is triggered for. Default: ["push"]

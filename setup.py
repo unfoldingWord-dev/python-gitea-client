@@ -9,13 +9,13 @@ with open(path.join(here, "README.rst"), "r") as f:
     long_description = f.read()
 
 setup(
-    name="gogs_client",
+    name="gitea_client",
     version="1.0.7",
-    description="A python library for interacting with a gogs server",
+    description="A python library for interacting with a Gitea server",
     long_description=long_description,
-    url="https://github.com/unfoldingWord-dev/python-gogs-client",
+    url="https://github.com/unfoldingWord-dev/python-gitea-client",
     author="unfoldingWord",
-    author_email="ethantkoenig@gmail.com",
+    author_email="dev@unfoldingword.org",
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
@@ -25,7 +25,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5'
     ],
-    keywords=["gogs", "http", "client"],
+    keywords=["gitea", "gogs", "http", "client"],
     packages=find_packages(),
     install_requires=["future", "requests", "attrs"],
     test_suite="tests"
