@@ -9,14 +9,14 @@ install:
 - pip install -r test_requirements.txt
 - pip install coveralls
 script:
--  coverage run --source=gitea_client setup.py test
+- coverage run --source=gitea_client setup.py test
 after_success:
--  coveralls
+- coveralls
 deploy:
   provider: pypi
   user: unfoldingword
   password:
-    secure: A95y2+mtUVlYXCWs8Iz9UsUjlL/H3mmbmru4M7yE96F+JLNHdvvpr6Ih9tL+4dXDluwV7ov+8YfyPGMZzW1FQXI32FBlJ4Q/C5+H+3pzqCIKj1BtdgaXsykIPbm56mZ3VQNXwQDS0ru4WP4LE2pM7dixse+XLB/mS/jU5kBBHRrxXOsx6H1ccZZlJ2aJ1RA56Mas9Yfe5Yd5IVnRpD0/MBqceceKd7CvZGE4XUjZFqsGM5TYuTAYWARQdNZhLEkLQ7pt5B30ZSkffV8ndyaqti9dy3wgSNOQsNnTDdpDlmkteL31Iz9kudCM2bz+GAe+T1ANVJ1xCgh/N3h0IfsJpsrem+9g0fr14gynOYiQfYNd1EKMReTCoRC4jqdcGCMvals9czR8m6JOAsdpSPEnhZihvxU+ASqnidMTr5FFiUAi0WnTB7SAOH29YA4V0ly48ELS3Y5UVl9GpBlh75Wx5J6jvJ+HM/lRFqnPhLVLp7y7sJ8+Z+UYMjK+J1EO9v6B3yb+o2E0IGU8mD4HnlSLe25do5mCHzLHwU8Q5T/DMxuat2MGgd3UAE89klKFH3f1FWSKv7tREiS/bn7Lw9ArFKVhCBIMtwDbF2hWOoQh4orQVYopFCFweKjsXlvcuEMkU8GIAgslcBjo62Ad4Ye0gjeVweO1kG/jOGybb5M4L0c=
+    secure: Zm+QzSxjTVG3qOR92fdImmdeIjHK11+lTeSg1ChbEJbq/pZw2O6RDSt2w8pafJUYRiyzjz6EYtRLZU/fCMP7qcO8NSD4m3adBVPKpaG515AnRjzYdkYTubNy2dHzU10bE4qkJsd0kbXSZwUdvUhoI6ZLu/IoYnlcD9tCAFaqWOS8fpWcFfzG9yB+SCOOz+O58BZdNmhs3o/uoZWUoPrs8/ux+ek3ghrJrkGJ4cVwLKGDpHiHmsKUqA3LEVQxvRWaiNnb9f7ASXaYyIG9nfBor145Xn3g7eaXV1ideFTFviog5+7CMaqIQExuJQX/X2g3zx4SqaPdE1nDaIJ4P8cclmVTR4kxwLQ4txCI7RwttuXojGhXwG4LO0A7IcWHHz6hqNhUhnTXvd7sVlx6YCjChRycpF1ttrsH98R+LcmIIwsid2lmtILHt9slO1vwXKqTt1VQaOYTHKnXYcTBIS0T7Srnl/sMnn/XkN8W/Wm7jWeMCtB7Ui59w7SLp/ghoMcbyLm3OI/JHkEY0jUmRcYkMp0dv3zuJCm4WE7kLd2I9R/sf3MkvbqchpHDf3vcoaPjm7I0forkCeXoxis+B+GAb1P6NVQhfuj9/vIZWowfWs9aOY81dZMp/tLg58btx+yxGdXQOiPcDI75Q720SirqjFl+UDku8Y+1nBbem2/gvSA=
   on:
     tags: true
   distributions: sdist bdist_wheel
