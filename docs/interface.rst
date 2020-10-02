@@ -1,9 +1,9 @@
 Interface
 =========
 
-.. py:currentmodule:: gogs_client.interface
+.. py:currentmodule:: gitea_client.interface
 
-.. autoclass:: GogsApi
+.. autoclass:: GiteaApi
     :members:
 
 .. autoexception:: ApiFailure

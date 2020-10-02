@@ -2,17 +2,17 @@ import requests
 
 from gitea_client._implementation.http_utils import RelativeHttpRequestor, append_url
 from gitea_client.auth import Token
-from gitea_client.entities import GogsUser, GogsRepo, GogsBranch, GogsOrg, GogsTeam
+from gitea_client.entities import GiteaUser, GiteaRepo, GiteaBranch, GiteaOrg, GiteaTeam
 
 
-class GogsApi(object):
+class GiteaApi(object):
     """
-    A Gogs client, serving as a wrapper around the Gogs HTTP API.
+    A Gitea client, serving as a wrapper around the Gitea HTTP API.
     """
 
     def __init__(self, base_url, session=None):
         """
-        :param str base_url: the URL of the Gogs server to communicate with. Should be given
+        :param str base_url: the URL of the Gitea server to communicate with. Should be given
                              with the https protocol
         :param requests.Session session: a ``requests`` session instance
         """
@@ -37,12 +37,12 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication for user to retrieve
 
         :return: user authenticated by the provided authentication
-        :rtype: GogsUser
+        :rtype: GiteaUser
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         response = self.get("/user", auth=auth)
-        return GogsUser.from_json(response.json())
+        return GiteaUser.from_json(response.json())
 
     def get_tokens(self, auth, username=None):
         """
@@ -51,7 +51,7 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication for user to retrieve.
                                          Must be a username-password authentication,
-                                         due to a restriction of the Gogs API
+                                         due to a restriction of the Gitea API
         :param str username: username of owner of tokens
 
         :return: list of tokens
@@ -71,7 +71,7 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication for user to retrieve.
                                          Must be a username-password authentication,
-                                         due to a restriction of the Gogs API
+                                         due to a restriction of the Gitea API
         :param str name: name of new token
         :param str username: username of owner of new token
 
@@ -94,7 +94,7 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication for user to retrieve.
                                          Must be a username-password authentication,
-                                         due to a restriction of the Gogs API
+                                         due to a restriction of the Gitea API
         :param str name: name of new token
         :param str username: username of owner of new token
 
@@ -126,7 +126,7 @@ class GogsApi(object):
         :param str readme_template: README template to apply
         :param str organization: organization under which repository is created
         :return: a representation of the created repository
-        :rtype: GogsRepo
+        :rtype: GiteaRepo
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -144,7 +144,7 @@ class GogsApi(object):
         data = {k: v for (k, v) in data.items() if v is not None}
         url = "/org/{0}/repos".format(organization) if organization else "/user/repos"
         response = self.post(url, auth=auth, data=data)
-        return GogsRepo.from_json(response.json())
+        return GiteaRepo.from_json(response.json())
 
     def repo_exists(self, auth, username, repo_name):
         """
@@ -170,13 +170,13 @@ class GogsApi(object):
         :param str username: username of owner of repository
         :param str repo_name: name of repository
         :return: a representation of the retrieved repository
-        :rtype: GogsRepo
+        :rtype: GiteaRepo
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}".format(u=username, r=repo_name)
         response = self.get(path, auth=auth)
-        return GogsRepo.from_json(response.json())
+        return GiteaRepo.from_json(response.json())
 
     def get_user_repos(self, auth, username):
         """
@@ -186,13 +186,13 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object
         :param str username: username of owner of repository
         :return: a list of repositories
-        :rtype: List[GogsRepo]
+        :rtype: List[GiteaRepo]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/users/{u}/repos".format(u=username)
         response = self.get(path, auth=auth)
-        return [GogsRepo.from_json(repo_json) for repo_json in response.json()]
+        return [GiteaRepo.from_json(repo_json) for repo_json in response.json()]
 
     def get_branch(self, auth, username, repo_name, branch_name):
         """
@@ -204,13 +204,13 @@ class GogsApi(object):
         :param str repo_name: name of the repository with the branch
         :param str branch_name: name of the branch to return
         :return: a branch
-        :rtype: GogsBranch
+        :rtype: GiteaBranch
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/branches/{b}".format(u=username, r=repo_name, b=branch_name)
         response = self.get(path, auth=auth)
-        return GogsBranch.from_json(response.json())
+        return GiteaBranch.from_json(response.json())
 
     def get_branches(self, auth, username, repo_name):
         """
@@ -221,13 +221,13 @@ class GogsApi(object):
         :param str username: username of owner of repository containing the branch
         :param str repo_name: name of the repository with the branch
         :return: a list of branches
-        :rtype: List[GogsBranch]
+        :rtype: List[GiteaBranch]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/branches".format(u=username, r=repo_name)
         response = self.get(path, auth=auth)
-        return [GogsBranch.from_json(branch_json) for branch_json in response.json()]
+        return [GiteaBranch.from_json(branch_json) for branch_json in response.json()]
 
     def delete_repo(self, auth, username, repo_name):
         """
@@ -256,7 +256,7 @@ class GogsApi(object):
         :param bool private: Repository will be private. Default is false
         :param str description: Repository description
         :return: a representation of the migrated repository
-        :rtype: GogsRepo
+        :rtype: GiteaRepo
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -274,7 +274,7 @@ class GogsApi(object):
         data = {k: v for (k, v) in data.items() if v is not None}
         url = "/repos/migrate"
         response = self.post(url, auth=auth, data=data)
-        return GogsRepo.from_json(response.json())
+        return GiteaRepo.from_json(response.json())
 
     def create_user(self, auth, login_name, username, email, password, send_notify=False):
         """
@@ -287,7 +287,7 @@ class GogsApi(object):
         :param str password: password for created user
         :param bool send_notify: whether a notification email should be sent upon creation
         :return: a representation of the created user
-        :rtype: GogsUser
+        :rtype: GiteaUser
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -301,7 +301,7 @@ class GogsApi(object):
             "send_notify": send_notify
         }
         response = self.post("/admin/users", auth=auth, data=data)
-        return GogsUser.from_json(response.json())
+        return GiteaUser.from_json(response.json())
 
     def user_exists(self, username):
         """
@@ -324,13 +324,13 @@ class GogsApi(object):
         :param str username_keyword: keyword to search with
         :param int limit: maximum number of returned users
         :return: a list of matched users
-        :rtype: List[GogsUser]
+        :rtype: List[GiteaUser]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         params = {"q": username_keyword, "limit": limit}
         response = self.get("/users/search", params=params)
-        return [GogsUser.from_json(user_json) for user_json in response.json()["data"]]
+        return [GiteaUser.from_json(user_json) for user_json in response.json()["data"]]
 
     def get_user(self, auth, username):
         """
@@ -339,13 +339,13 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object, can be ``None``
         :param str username: username of user to get
         :return: the retrieved user
-        :rtype: GogsUser
+        :rtype: GiteaUser
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/users/{}".format(username)
         response = self.get(path, auth=auth)
-        return GogsUser.from_json(response.json())
+        return GiteaUser.from_json(response.json())
 
     def update_user(self, auth, username, update):
         """
@@ -353,15 +353,15 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str username: username of user to update
-        :param GogsUserUpdate update: a ``GogsUserUpdate`` object describing the requested update
+        :param GiteaUserUpdate update: a ``GiteaUserUpdate`` object describing the requested update
         :return: the updated user
-        :rtype: GogsUser
+        :rtype: GiteaUser
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/admin/users/{}".format(username)
         response = self.patch(path, auth=auth, data=update.as_dict())
-        return GogsUser.from_json(response.json())
+        return GiteaUser.from_json(response.json())
 
     def delete_user(self, auth, username):
         """
@@ -383,13 +383,13 @@ class GogsApi(object):
         :param str username: username of owner of repository
         :param str repo_name: name of repository
         :return: a list of hooks for the specified repository
-        :rtype: List[GogsRepo.Hooks]
+        :rtype: List[GiteaRepo.Hooks]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         path = "/repos/{u}/{r}/hooks".format(u=username, r=repo_name)
         response = self.get(path, auth=auth)
-        return [GogsRepo.Hook.from_json(hook) for hook in response.json()]
+        return [GiteaRepo.Hook.from_json(hook) for hook in response.json()]
 
     def create_hook(self, auth, repo_name, hook_type, config, events=None, organization=None, active=False):
         """
@@ -397,14 +397,14 @@ class GogsApi(object):
 
         :param auth.Authentication auth: authentication object, must be admin-level
         :param str repo_name: the name of the repo for which we create the hook
-        :param str hook_type: The type of webhook, either "gitea", "gogs" or "slack"
+        :param str hook_type: The type of webhook, either "gitea", "gitea" or "slack"
         :param dict config: Settings for this hook (possible keys are
                             ``"url"``, ``"content_type"``, ``"secret"``)
         :param list events: Determines what events the hook is triggered for. Default: ["push"]
         :param str organization: Organization of the repo
         :param bool active: Determines whether the hook is actually triggered on pushes. Default is false
         :return: a representation of the created hook
-        :rtype: GogsRepo.Hook
+        :rtype: GiteaRepo.Hook
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -421,7 +421,7 @@ class GogsApi(object):
         url = "/repos/{o}/{r}/hooks".format(o=organization, r=repo_name) if organization is not None \
             else "/repos/{r}/hooks".format(r=repo_name)
         response = self.post(url, auth=auth, data=data)
-        return GogsRepo.Hook.from_json(response.json())
+        return GiteaRepo.Hook.from_json(response.json())
 
     def update_hook(self, auth, repo_name, hook_id, update, organization=None):
         """
@@ -430,10 +430,10 @@ class GogsApi(object):
         :param auth.Authentication auth: authentication object
         :param str repo_name: repo of the hook to update
         :param int hook_id: id of the hook to update
-        :param GogsHookUpdate update: a ``GogsHookUpdate`` object describing the requested update
+        :param GiteaHookUpdate update: a ``GiteaHookUpdate`` object describing the requested update
         :param str organization: name of associated organization, if applicable
         :return: the updated hook
-        :rtype: GogsRepo.Hook
+        :rtype: GiteaRepo.Hook
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -442,7 +442,7 @@ class GogsApi(object):
         else:
             path = "/repos/{r}/hooks/{i}".format(r=repo_name, i=hook_id)
         response = self._patch(path, auth=auth, data=update.as_dict())
-        return GogsRepo.Hook.from_json(response.json())
+        return GiteaRepo.Hook.from_json(response.json())
 
     def delete_hook(self, auth, username, repo_name, hook_id):
         """
@@ -472,7 +472,7 @@ class GogsApi(object):
         :param str website: Official website
         :param str location: Organization location
         :return: a representation of the created organization
-        :rtype: GogsOrg
+        :rtype: GiteaOrg
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -486,7 +486,7 @@ class GogsApi(object):
 
         url = "/admin/users/{u}/orgs".format(u=owner_name)
         response = self.post(url, auth=auth, data=data)
-        return GogsOrg.from_json(response.json())
+        return GiteaOrg.from_json(response.json())
 
     def create_organization_team(self, auth, org_name, name, description=None, permission="read"):
         """
@@ -498,7 +498,7 @@ class GogsApi(object):
         :param str description: Description of the team
         :param str permission: Team permission, can be read, write or admin, default is read
         :return: a representation of the created team
-        :rtype: GogsTeam
+        :rtype: GiteaTeam
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -510,7 +510,7 @@ class GogsApi(object):
 
         url = "/admin/orgs/{o}/teams".format(o=org_name)
         response = self.post(url, auth=auth, data=data)
-        return GogsTeam.from_json(response.json())
+        return GiteaTeam.from_json(response.json())
 
     def add_team_membership(self, auth, team_id, username):
         """
@@ -572,12 +572,12 @@ class GogsApi(object):
         :param str username: username of owner of repository
         :param str repo_name: the name of the repo
         :return: a list of deploy keys for the repo
-        :rtype: List[GogsRepo.DeployKey]
+        :rtype: List[GiteaRepo.DeployKey]
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         response = self.get("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth)
-        return [GogsRepo.DeployKey.from_json(key_json) for key_json in response.json()]
+        return [GiteaRepo.DeployKey.from_json(key_json) for key_json in response.json()]
 
     def get_deploy_key(self, auth, username, repo_name, key_id):
         """
@@ -588,12 +588,12 @@ class GogsApi(object):
         :param str repo_name: the name of the repo
         :param int key_id: the id of the key
         :return: the deploy key
-        :rtype: GogsRepo.DeployKey
+        :rtype: GiteaRepo.DeployKey
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
         response = self.get("/repos/{u}/{r}/keys/{k}".format(u=username, r=repo_name, k=key_id), auth=auth)
-        return GogsRepo.DeployKey.from_json(response.json())
+        return GiteaRepo.DeployKey.from_json(response.json())
 
     def add_deploy_key(self, auth, username, repo_name, title, key_content):
         """
@@ -605,7 +605,7 @@ class GogsApi(object):
         :param str title: title of the key to add
         :param str key_content: content of the key to add
         :return: a representation of the added deploy key
-        :rtype: GogsRepo.DeployKey
+        :rtype: GiteaRepo.DeployKey
         :raises NetworkFailure: if there is an error communicating with the server
         :raises ApiFailure: if the request cannot be serviced
         """
@@ -614,7 +614,7 @@ class GogsApi(object):
             "key": key_content
         }
         response = self.post("/repos/{u}/{r}/keys".format(u=username, r=repo_name), auth=auth, data=data)
-        return GogsRepo.DeployKey.from_json(response.json())
+        return GiteaRepo.DeployKey.from_json(response.json())
 
     def delete_deploy_key(self, auth, username, repo_name, key_id):
         """
@@ -742,7 +742,7 @@ class GogsApi(object):
         Raise exception if response is non-OK, otherwise return response
         """
         if not response.ok:
-            GogsApi._fail(response)
+            GiteaApi._fail(response)
         return response
 
     @staticmethod

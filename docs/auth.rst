@@ -1,7 +1,7 @@
 Authentication
 ==============
 
-.. py:currentmodule:: gogs_client.auth
+.. py:currentmodule:: gitea_client.auth
 
 .. autoclass:: Authentication()
     :members:

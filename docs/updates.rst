@@ -1,16 +1,16 @@
 Updates
 =======
 
-.. py:currentmodule:: gogs_client.updates
+.. py:currentmodule:: gitea_client.updates
 
-.. autoclass:: GogsUserUpdate()
+.. autoclass:: GiteaUserUpdate()
     :members:
 
-.. autoclass:: gogs_client.updates::GogsUserUpdate.Builder()
+.. autoclass:: gitea_client.updates::GiteaUserUpdate.Builder()
     :members:
 
-.. autoclass:: GogsHookUpdate()
+.. autoclass:: GiteaHookUpdate()
     :members:
 
-.. autoclass:: gogs_client.updates::GogsHookUpdate.Builder()
+.. autoclass:: gitea_client.updates::GiteaHookUpdate.Builder()
     :members:

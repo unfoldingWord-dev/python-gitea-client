@@ -1,13 +1,13 @@
 """
-Various classes representing update requests to Gogs
+Various classes representing update requests to Gitea
 """
 
 
-class GogsUserUpdate(object):
+class GiteaUserUpdate(object):
     """
-    An immutable representation of a collection of Gogs user attributes to update.
+    An immutable representation of a collection of Gitea user attributes to update.
 
-    Instances should be created using the :class:`~GogsUserUpdate.Builder` class.
+    Instances should be created using the :class:`~GiteaUserUpdate.Builder` class.
     """
 
     def __init__(self, source_id, login_name, full_name, email, password, website,
@@ -63,7 +63,7 @@ class GogsUserUpdate(object):
             :param int source_id: Source id of authentication source
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._source_id = source_id
             return self
@@ -73,7 +73,7 @@ class GogsUserUpdate(object):
             :param str full_name: Updated full name for user
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._full_name = full_name
             return self
@@ -83,7 +83,7 @@ class GogsUserUpdate(object):
             :param str password: Updated password for user
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._password = password
             return self
@@ -93,7 +93,7 @@ class GogsUserUpdate(object):
             :param str website: Updated personal website for user
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._website = website
             return self
@@ -103,7 +103,7 @@ class GogsUserUpdate(object):
             :param str location: Updated location for user
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._location = location
             return self
@@ -114,7 +114,7 @@ class GogsUserUpdate(object):
                                 activated/deactivated
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._active = active
             return self
@@ -124,7 +124,7 @@ class GogsUserUpdate(object):
             :param bool admin: whether the updated user should be admin
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._admin = admin
             return self
@@ -134,7 +134,7 @@ class GogsUserUpdate(object):
             :param bool allow_git_hook: whether the updated user should be allowed to use Git hooks
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._allow_git_hook = allow_git_hook
             return self
@@ -146,17 +146,17 @@ class GogsUserUpdate(object):
                                             import local repositories
 
             :return: the updated builder
-            :rtype: GogsUserUpdate.Builder
+            :rtype: GiteaUserUpdate.Builder
             """
             self._allow_import_local = allow_import_local
             return self
 
         def build(self):
             """
-            :return: A :class:`~GogsUserUpdate` instance reflecting the changes added to the builder.
-            :rtype: GogsUserUpdate
+            :return: A :class:`~GiteaUserUpdate` instance reflecting the changes added to the builder.
+            :rtype: GiteaUserUpdate
             """
-            return GogsUserUpdate(
+            return GiteaUserUpdate(
                 source_id=self._source_id,
                 login_name=self._login_name,
                 full_name=self._full_name,
@@ -170,11 +170,11 @@ class GogsUserUpdate(object):
                 allow_import_local=self._allow_import_local)
 
 
-class GogsHookUpdate(object):
+class GiteaHookUpdate(object):
     """
-    An immutable representation of a collection of Gogs hook attributes to update.
+    An immutable representation of a collection of Gitea hook attributes to update.
 
-    Instances should be created using the :class:`~GogsHookUpdate.Builder` class.
+    Instances should be created using the :class:`~GiteaHookUpdate.Builder` class.
     """
 
     def __init__(self, events, config, active):
@@ -200,7 +200,7 @@ class GogsHookUpdate(object):
             """
             :param List[str] events:
             :return: the updated builder
-            :rtype: GogsHookUpdate.Builder
+            :rtype: GiteaHookUpdate.Builder
             """
             self._events = events
             return self
@@ -209,7 +209,7 @@ class GogsHookUpdate(object):
             """
             :param dict config:
             :return: the updated builder
-            :rtype: GogsHookUpdate.Builder
+            :rtype: GiteaHookUpdate.Builder
             """
             self._config = config
             return self
@@ -218,17 +218,17 @@ class GogsHookUpdate(object):
             """
             :param bool active:
             :return: the updated builder
-            :rtype: GogsHookUpdate.Builder
+            :rtype: GiteaHookUpdate.Builder
             """
             self._active = active
             return self
 
         def build(self):
             """
-            :return: A :class:`~GogsHookUpdate` instance reflecting the changes added to the builder.
-            :rtype: GogsHookUpdate
+            :return: A :class:`~GiteaHookUpdate` instance reflecting the changes added to the builder.
+            :rtype: GiteaHookUpdate
             """
-            return GogsHookUpdate(
+            return GiteaHookUpdate(
                 events=self._events,
                 config=self._config,
                 active=self._active)

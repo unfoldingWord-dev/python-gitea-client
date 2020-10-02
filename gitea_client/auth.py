@@ -1,5 +1,5 @@
 """
-Various classes for Gogs authentication
+Various classes for Gitea authentication
 """
 from gitea_client.entities import json_get
 
@@ -7,7 +7,7 @@ from gitea_client.entities import json_get
 class Authentication(object):
     """
     An "abstract" parent class. Represents a
-    means of authenticating oneself to Gogs
+    means of authenticating oneself to Gitea
     """
 
     def update_kwargs(self, kwargs):
@@ -22,12 +22,12 @@ class Authentication(object):
 
 class Token(Authentication):
     """
-    An immutable representation of a Gogs authentication token
+    An immutable representation of a Gitea authentication token
     """
 
     def __init__(self, token, name=None):
         """
-        :param str token: contents of Gogs authentication token
+        :param str token: contents of Gitea authentication token
         """
         self._token = token
         self._name = name
@@ -50,7 +50,7 @@ class Token(Authentication):
     @property
     def token(self):
         """
-        The contents of the Gogs authentication token
+        The contents of the Gitea authentication token
 
         :rtype: str
         """
@@ -65,13 +65,13 @@ class Token(Authentication):
 
 class UsernamePassword(Authentication):
     """
-    An immutable representation of a Gogs username/password combination
+    An immutable representation of a Gitea username/password combination
     """
 
     def __init__(self, username, password):
         """
-        :param str username: Username for Gogs account
-        :param str password: Password for Gogs account
+        :param str username: Username for Gitea account
+        :param str password: Password for Gitea account
         """
         self._username = username
         self._password = password
@@ -79,7 +79,7 @@ class UsernamePassword(Authentication):
     @property
     def username(self):
         """
-        Username for Gogs account
+        Username for Gitea account
 
         :rtype: str
         """
@@ -88,7 +88,7 @@ class UsernamePassword(Authentication):
     @property
     def password(self):
         """
-        Password for Gogs account
+        Password for Gitea account
         :rtype: str
         """
         return self._password

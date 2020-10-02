@@ -1,5 +1,5 @@
 """
-Various immutable classes that represent Gogs entities.
+Various immutable classes that represent Gitea entities.
 """
 
 from collections import OrderedDict
@@ -18,7 +18,7 @@ def json_get(parsed_json, key):
 
 
 @attr.s
-class GogsEntity(object):
+class GiteaEntity(object):
     json = attr.ib()
 
     @classmethod
@@ -41,9 +41,9 @@ class GogsEntity(object):
 
 
 @attr.s(frozen=True)
-class GogsUser(GogsEntity):
+class GiteaUser(GiteaEntity):
     """
-     An immutable representation of a Gogs user
+     An immutable representation of a Gitea user
     """
 
     #: The user's id
@@ -81,9 +81,9 @@ class GogsUser(GogsEntity):
 
 
 @attr.s(frozen=True)
-class GogsRepo(GogsEntity):
+class GiteaRepo(GiteaEntity):
     """
-    An immutable representation of a Gogs repository
+    An immutable representation of a Gitea repository
     """
 
     #: The repository's id
@@ -101,8 +101,8 @@ class GogsRepo(GogsEntity):
 
     #: The owner of the repository
     #:
-    #: :type: :class:`~GogsUser`
-    owner = attr.ib(converter=lambda parsed_json: GogsUser.from_json(parsed_json))
+    #: :type: :class:`~GiteaUser`
+    owner = attr.ib(converter=lambda parsed_json: GiteaUser.from_json(parsed_json))
 
     #: The name of the repository
     #:
@@ -138,19 +138,19 @@ class GogsRepo(GogsEntity):
         """
         URLs of the repository
 
-        :type: :class:`~GogsRepo.Urls`
+        :type: :class:`~GiteaRepo.Urls`
         """
-        return GogsRepo.Urls(self._html_url, self._clone_url, self._ssh_url)
+        return GiteaRepo.Urls(self._html_url, self._clone_url, self._ssh_url)
 
     #: Permissions for the repository
     #:
-    #: :type: :class:`~GogsRepo.Permissions`
-    permissions = attr.ib(converter=lambda data: GogsRepo.Permissions.from_json(data))
+    #: :type: :class:`~GiteaRepo.Permissions`
+    permissions = attr.ib(converter=lambda data: GiteaRepo.Permissions.from_json(data))
 
     #: Gets the repository's parent, when a fork
     #:
-    #: :type: :class:`~GogsRepo`
-    parent = attr.ib(converter=lambda data: GogsRepo.from_json(data) if data else None, default=None)
+    #: :type: :class:`~GiteaRepo`
+    parent = attr.ib(converter=lambda data: GiteaRepo.from_json(data) if data else None, default=None)
 
     #: The description of the repository
     #:
@@ -185,7 +185,7 @@ class GogsRepo(GogsEntity):
         ssh_url = attr.ib()
 
     @attr.s(frozen=True)
-    class Permissions(GogsEntity):
+    class Permissions(GiteaEntity):
         #: Whether the user that requested this repository has admin permissions
         #:
         #: :type: bool
@@ -202,7 +202,7 @@ class GogsRepo(GogsEntity):
         pull = attr.ib(default=False)
 
     @attr.s(frozen=True)
-    class Hook(GogsEntity):
+    class Hook(GiteaEntity):
         #: The hook's id number
         #:
         #: :type: int
@@ -216,12 +216,12 @@ class GogsRepo(GogsEntity):
         #:    Use :data:`id` instead
         hook_id = property(lambda self: self.id)
 
-        #: The hook's type (gitea, gogs, slack, etc.)
+        #: The hook's type (gitea, slack, etc.)
         #:
         #: :type: str
         type = attr.ib()
 
-        #: The hook's type (gogs, slack, etc.)
+        #: The hook's type (gitea, slack, etc.)
         #:
         #: :type: str
         #:
@@ -245,7 +245,7 @@ class GogsRepo(GogsEntity):
         config = attr.ib()
 
     @attr.s(frozen=True)
-    class DeployKey(GogsEntity):
+    class DeployKey(GiteaEntity):
         #: The key's id number
         #:
         #: :type: int
@@ -286,9 +286,9 @@ class GogsRepo(GogsEntity):
 
 
 @attr.s(frozen=True)
-class GogsBranch(GogsEntity):
+class GiteaBranch(GiteaEntity):
     """
-    An immutable representation of a Gogs branch
+    An immutable representation of a Gitea branch
     """
 
     #: The branch's name
@@ -298,14 +298,14 @@ class GogsBranch(GogsEntity):
 
     #: The HEAD commit of the branch
     #:
-    #: :type: :class:`~GogsCommit`
-    commit = attr.ib(converter=lambda parsed_json: GogsCommit.from_json(parsed_json))
+    #: :type: :class:`~GiteaCommit`
+    commit = attr.ib(converter=lambda parsed_json: GiteaCommit.from_json(parsed_json))
 
 
 @attr.s(frozen=True)
-class GogsCommit(GogsEntity):
+class GiteaCommit(GiteaEntity):
     """
-    An immutable representation of a Gogs commit
+    An immutable representation of a Gitea commit
     """
 
     #: The commit's id
@@ -330,9 +330,9 @@ class GogsCommit(GogsEntity):
 
 
 @attr.s(frozen=True)
-class GogsOrg(GogsEntity):
+class GiteaOrg(GiteaEntity):
     """
-     An immutable representation of a Gogs organization
+     An immutable representation of a Gitea organization
     """
 
     #: The organization's id
@@ -380,9 +380,9 @@ class GogsOrg(GogsEntity):
 
 
 @attr.s(frozen=True)
-class GogsTeam(GogsEntity):
+class GiteaTeam(GiteaEntity):
     """
-    An immutable representation of a Gogs organization team
+    An immutable representation of a Gitea organization team
     """
 
     #: Team's id

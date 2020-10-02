@@ -9,18 +9,18 @@ import gitea_client
 import gitea_client._implementation.http_utils as http_utils
 
 
-class GogsClientInterfaceTest(unittest.TestCase):
+class GiteaClientInterfaceTest(unittest.TestCase):
     def setUp(self):
         self.api_endpoint = "https://www.example.com/api/v1/"
         self.base_url = "https://www.example.com/"
-        self.client = gitea_client.GogsApi(self.base_url)
+        self.client = gitea_client.GiteaApi(self.base_url)
         self.repo_json_str = """{
                 "id": 27,
                 "owner": {
                     "id": 1,
                     "username": "unknwon",
                     "full_name": "",
-                    "email": "u@gogs.io",
+                    "email": "u@gitea.io",
                     "avatar_url": "/avatars/1"
                   },
                   "name": "Hello-World",
@@ -47,7 +47,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "id": 1,
                     "username": "unknwon",
                     "full_name": "",
-                    "email": "u@gogs.io",
+                    "email": "u@gitea.io",
                     "avatar_url": "/avatars/1"
                   },
                   "name": "Hello-World",
@@ -73,7 +73,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                     "id": 1,
                     "username": "unknwon",
                     "full_name": "",
-                    "email": "u@gogs.io",
+                    "email": "u@gitea.io",
                     "avatar_url": "/avatars/1"
                   },
                   "name": "Hello-World-Again",
@@ -171,7 +171,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
                   "id": 1,
                   "username": "unknwon",
                   "full_name": "",
-                  "email": "u@gogs.io",
+                  "email": "u@gitea.io",
                   "avatar_url": "/avatars/1"
                 }"""
         self.token_json_str = """{
@@ -182,7 +182,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
             "auth_username", "password")
         self.hook_json_str = """{
                 "id": 4,
-                "type": "gogs",
+                "type": "gitea",
                 "config": {
                   "content_type": "json",
                   "url": "http://test.io/hook"
@@ -199,7 +199,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         self.hooks_list_json_str = """[
               {
                 "id": 4,
-                "type": "gogs",
+                "type": "gitea",
                 "config": {
                   "content_type": "json",
                   "url": "http://test.io/hook"
@@ -215,7 +215,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
               },
               {
                 "id": 3,
-                "type": "gogs",
+                "type": "gitea",
                 "config": {
                   "content_type": "json",
                   "url": "http://192.168.201.1:8080/hook22/"
@@ -230,11 +230,11 @@ class GogsClientInterfaceTest(unittest.TestCase):
             ]"""
         self.org_json_str = """{
               "id": 7,
-              "username": "gogs2",
-              "full_name": "Gogs2",
+              "username": "gitea2",
+              "full_name": "Gitea2",
               "avatar_url": "/avatars/7",
-              "description": "Gogs is a painless self-hosted Git Service.",
-              "website": "https://gogs.io",
+              "description": "Gitea is a painless self-hosted Git Service.",
+              "website": "https://gitea.io",
               "location": "USA"
             }"""
         self.team_json_str = """{
@@ -266,13 +266,13 @@ class GogsClientInterfaceTest(unittest.TestCase):
               "created_at": "2015-11-18T15:05:43-05:00",
               "read_only": true
             }]"""
-        self.expected_repo = gitea_client.GogsRepo.from_json(json.loads(self.repo_json_str))
-        self.expected_branch = gitea_client.GogsBranch.from_json(json.loads(self.branch_json_str))
-        self.expected_user = gitea_client.GogsUser.from_json(json.loads(self.user_json_str))
-        self.expected_hook = gitea_client.GogsRepo.Hook.from_json(json.loads(self.hook_json_str))
-        self.expected_org = gitea_client.GogsOrg.from_json(json.loads(self.org_json_str))
-        self.expected_team = gitea_client.GogsTeam.from_json(json.loads(self.team_json_str))
-        self.expected_key = gitea_client.GogsRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
+        self.expected_repo = gitea_client.GiteaRepo.from_json(json.loads(self.repo_json_str))
+        self.expected_branch = gitea_client.GiteaBranch.from_json(json.loads(self.branch_json_str))
+        self.expected_user = gitea_client.GiteaUser.from_json(json.loads(self.user_json_str))
+        self.expected_hook = gitea_client.GiteaRepo.Hook.from_json(json.loads(self.hook_json_str))
+        self.expected_org = gitea_client.GiteaOrg.from_json(json.loads(self.org_json_str))
+        self.expected_team = gitea_client.GiteaTeam.from_json(json.loads(self.team_json_str))
+        self.expected_key = gitea_client.GiteaRepo.DeployKey.from_json(json.loads(self.deploy_key_json_str))
         self.token = gitea_client.Token.from_json(json.loads(self.token_json_str))
 
     @responses.activate
@@ -420,7 +420,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_user1(self):
-        update = gitea_client.GogsUserUpdate.Builder("loginname", "user@example.com") \
+        update = gitea_client.GiteaUserUpdate.Builder("loginname", "user@example.com") \
             .set_full_name("Example User") \
             .set_password("Password") \
             .set_website("mywebsite.net") \
@@ -522,7 +522,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.POST, uri, body=self.hook_json_str)
         hook = self.client.create_hook(self.token,
                                        repo_name="repo1",
-                                       hook_type="gogs",
+                                       hook_type="gitea",
                                        config={
                                            "content_type": "json2",
                                            "url": "http://test.io/hook"
@@ -537,7 +537,7 @@ class GogsClientInterfaceTest(unittest.TestCase):
 
     @responses.activate
     def test_update_hook1(self):
-        update = gitea_client.GogsHookUpdate.Builder() \
+        update = gitea_client.GiteaHookUpdate.Builder() \
             .set_events(["issues_comments"]) \
             .set_config({"url": "http://newurl.com/hook"}) \
             .set_active(True) \
@@ -576,10 +576,10 @@ class GogsClientInterfaceTest(unittest.TestCase):
         responses.add(responses.POST, uri, body=self.org_json_str)
         org = self.client.create_organization(self.token,
                                               owner_name="username",
-                                              org_name="gogs2",
-                                              full_name="Gogs2",
-                                              description="Gogs is a painless self-hosted Git Service.",
-                                              website="https://gogs.io",
+                                              org_name="gitea2",
+                                              full_name="Gitea2",
+                                              description="Gitea is a painless self-hosted Git Service.",
+                                              website="https://gitea.io",
                                               location="USA")
         self.assert_org_equals(org, self.expected_org)
         self.assertEqual(len(responses.calls), 1)

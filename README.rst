@@ -16,7 +16,7 @@ Develop:
 
 
 python-gitea-client
-==================
+===================
 
 This is a Python client to Gitea servers. The easiest way to install is via ``pip``::
 

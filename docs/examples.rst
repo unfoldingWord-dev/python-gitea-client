@@ -6,13 +6,13 @@ Example 1: Retrieving a repository
 
 Below is an example illustrating how to retrieve information about a repository::
 
-    import gogs_client
+    import gitea_client
 
-    token = gogs_client.Token("my_token")
+    token = gitea_client.Token("my_token")
     username = "username"  # username of owner of repo
     repository_name = "repo_name"
 
-    api = GogsApi("https://try.gogs.io/")
+    api = GiteaApi("https://try.gitea.io/")
 
     if not api.repo_exists(token, username, repository_name):
         print("Repository does not exist")
@@ -29,20 +29,20 @@ Example 2: Updating a user
 
 Below is an example demonstrating how to update a user (requires admin privileges)::
 
-    import gogs_client
+    import gitea_client
 
     login_name = "my_login"
     user_email = "user_to_update@example.com"
 
-    update = gogs_client.GogsUserUpdate.Builder(login_name, user_email)\
+    update = gitea_client.GiteaUserUpdate.Builder(login_name, user_email)\
                 .set_full_name("New Full Name")\
                 .set_password("New Password")\
                 .set_admin(False)\  # set the updated user as non-admin
                 .build()
 
-    api = gogs_client.GogsApi("https://try.gogs.io/")
+    api = gitea_client.GiteaApi("https://try.gitea.io/")
     api.update_user(
-        gogs_client.Token("my_token"),  # must be admin
+        gitea_client.Token("my_token"),  # must be admin
         "username_to_update",
         update)
 
@@ -52,11 +52,11 @@ Example 3: Creating a token
 
 Below is an example illustrating how to create a token::
 
-    import gogs_client
+    import gitea_client
 
-    api = gogs_client.GogsApi("https://try.gogs.io/")
+    api = gitea_client.GiteaApi("https://try.gitea.io/")
 
-    auth = gogs_client.UsernamePassword("username", "password")
+    auth = gitea_client.UsernamePassword("username", "password")
     token = api.create_token(auth, "my_token")
 
     print("token: {}, name: {}".format(token.token, token.name))

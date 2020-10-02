@@ -13,6 +13,7 @@ setup(
     version="1.0.7",
     description="A python library for interacting with a Gitea server",
     long_description=long_description,
+    long_description_content_type="text/x-rst",
     url="https://github.com/unfoldingWord-dev/python-gitea-client",
     author="unfoldingWord",
     author_email="dev@unfoldingword.org",

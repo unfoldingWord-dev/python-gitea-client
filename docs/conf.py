@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# gogs_client documentation build configuration file, created by
+# gitea_client documentation build configuration file, created by
 # sphinx-quickstart on Mon Aug  8 21:56:44 2016.
 #
 # This file is execfile()d with the current directory set to its
@@ -52,7 +52,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'gogs_client'
+project = u'gitea_client'
 copyright = u'2016, unfoldingWord'
 author = u'unfoldingWord'
 
@@ -137,7 +137,7 @@ html_theme = 'sphinx_rtd_theme'
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-# html_title = u'gogs_client v1.0.1'
+# html_title = u'gitea_client v1.0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -237,7 +237,7 @@ html_static_path = ['_static']
 # html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'gogs_clientdoc'
+htmlhelp_basename = 'gitea_clientdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -263,7 +263,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'gogs_client.tex', u'gogs\\_client Documentation',
+    (master_doc, 'gitea_client.tex', u'gitea\\_client Documentation',
      u'unfoldingWord', 'manual'),
 ]
 
@@ -299,7 +299,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'gogs_client', u'gogs_client Documentation',
+    (master_doc, 'gitea_client', u'gitea_client Documentation',
      [author], 1)
 ]
 
@@ -314,8 +314,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'gogs_client', u'gogs_client Documentation',
-     author, 'gogs_client', 'One line description of project.',
+    (master_doc, 'gitea_client', u'gitea_client Documentation',
+     author, 'gitea_client', 'One line description of project.',
      'Miscellaneous'),
 ]
 
@@ -349,7 +349,7 @@ def maybe_skip_member(app, what, name, obj, skip, options):
     whitelisted_names = []
     if name in whitelisted_names:
         return False
-    whitelisted_init_classes = ["GogsApi", "Token", "UsernamePassword", "Builder"]
+    whitelisted_init_classes = ["GiteaApi", "Token", "UsernamePassword", "Builder"]
     if name == "__init__":
         if hasattr(obj, 'im_class'):
             return obj.im_class.__name__ not in whitelisted_init_classes

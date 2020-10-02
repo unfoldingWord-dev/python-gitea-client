@@ -1,55 +1,55 @@
-Gogs Entities
-=============
+Gitea Entities
+==============
 
-This page documents the classes provided by ``gogs_client`` module that represent entities
-(e.g. users, repositories) in a `Gogs <https://gogs.io/>`_ server.
+This page documents the classes provided by ``gitea_client`` module that represent entities
+(e.g. users, repositories) in a `Gitea <https://gitea.io/>`_ server.
 
-.. py:currentmodule:: gogs_client.entities
+.. py:currentmodule:: gitea_client.entities
 
-GogsUser
+GiteaUser
+---------
+
+.. autoclass:: gitea_client.entities::GiteaUser()
+    :members:
+
+GiteaRepo
+---------
+
+.. autoclass:: gitea_client.entities::GiteaRepo()
+    :members:
+
+.. autoclass:: gitea_client.entities::GiteaRepo.Urls()
+    :members:
+
+.. autoclass:: gitea_client.entities::GiteaRepo.Permissions()
+    :members:
+
+.. autoclass:: gitea_client.entities::GiteaRepo.Hook()
+    :members:
+
+.. autoclass:: gitea_client.entities::GiteaRepo.DeployKey()
+    :members:
+
+GiteaOrg
 --------
 
-.. autoclass:: gogs_client.entities::GogsUser()
+.. autoclass:: gitea_client.entities::GiteaOrg()
     :members:
 
-GogsRepo
---------
+GiteaTeam
+---------
 
-.. autoclass:: gogs_client.entities::GogsRepo()
+.. autoclass:: gitea_client.entities::GiteaTeam()
     :members:
 
-.. autoclass:: gogs_client.entities::GogsRepo.Urls()
+GiteaBranch
+-----------
+
+.. autoclass:: gitea_client.entities::GiteaBranch()
     :members:
 
-.. autoclass:: gogs_client.entities::GogsRepo.Permissions()
-    :members:
+GiteaCommit
+-----------
 
-.. autoclass:: gogs_client.entities::GogsRepo.Hook()
-    :members:
-
-.. autoclass:: gogs_client.entities::GogsRepo.DeployKey()
-    :members:
-
-GogsOrg
--------
-
-.. autoclass:: gogs_client.entities::GogsOrg()
-    :members:
-
-GogsTeam
---------
-
-.. autoclass:: gogs_client.entities::GogsTeam()
-    :members:
-
-GogsBranch
-----------
-
-.. autoclass:: gogs_client.entities::GogsBranch()
-    :members:
-
-GogsCommit
-----------
-
-.. autoclass:: gogs_client.entities::GogsCommit()
+.. autoclass:: gitea_client.entities::GiteaCommit()
     :members:

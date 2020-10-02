@@ -8,12 +8,12 @@ install:
 - pip install -r test_requirements.txt
 - pip install coveralls
 script:
--  coverage run --source=gogs_client setup.py test
+-  coverage run --source=gitea_client setup.py test
 after_success:
 -  coveralls
 deploy:
   provider: pypi
-  user: ethantkoenig
+  user: unfoldingword
   password:
     secure: A95y2+mtUVlYXCWs8Iz9UsUjlL/H3mmbmru4M7yE96F+JLNHdvvpr6Ih9tL+4dXDluwV7ov+8YfyPGMZzW1FQXI32FBlJ4Q/C5+H+3pzqCIKj1BtdgaXsykIPbm56mZ3VQNXwQDS0ru4WP4LE2pM7dixse+XLB/mS/jU5kBBHRrxXOsx6H1ccZZlJ2aJ1RA56Mas9Yfe5Yd5IVnRpD0/MBqceceKd7CvZGE4XUjZFqsGM5TYuTAYWARQdNZhLEkLQ7pt5B30ZSkffV8ndyaqti9dy3wgSNOQsNnTDdpDlmkteL31Iz9kudCM2bz+GAe+T1ANVJ1xCgh/N3h0IfsJpsrem+9g0fr14gynOYiQfYNd1EKMReTCoRC4jqdcGCMvals9czR8m6JOAsdpSPEnhZihvxU+ASqnidMTr5FFiUAi0WnTB7SAOH29YA4V0ly48ELS3Y5UVl9GpBlh75Wx5J6jvJ+HM/lRFqnPhLVLp7y7sJ8+Z+UYMjK+J1EO9v6B3yb+o2E0IGU8mD4HnlSLe25do5mCHzLHwU8Q5T/DMxuat2MGgd3UAE89klKFH3f1FWSKv7tREiS/bn7Lw9ArFKVhCBIMtwDbF2hWOoQh4orQVYopFCFweKjsXlvcuEMkU8GIAgslcBjo62Ad4Ye0gjeVweO1kG/jOGybb5M4L0c=
   on:
