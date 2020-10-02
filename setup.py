@@ -10,7 +10,7 @@ with open(path.join(here, "README.rst"), "r") as f:
 
 setup(
     name="gogs_client",
-    version="1.0.6",
+    version="1.0.7",
     description="A python library for interacting with a gogs server",
     long_description=long_description,
     url="https://github.com/unfoldingWord-dev/python-gogs-client",
