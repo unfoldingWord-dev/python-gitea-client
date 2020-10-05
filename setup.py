@@ -10,7 +10,7 @@ with open(path.join(here, "README.rst"), "r") as f:
 
 setup(
     name="gitea_client",
-    version="1.0.8",
+    version="1.0.9",
     description="A python library for interacting with a Gitea server",
     long_description=long_description,
     long_description_content_type="text/x-rst",
