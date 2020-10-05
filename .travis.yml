@@ -12,11 +12,17 @@ script:
 - coverage run --source=gitea_client setup.py test
 after_success:
 - coveralls
-deploy:
-  provider: pypi
-  user: __token__
-  password:
-    secure: T2gpaUe9eayCKlTWJnmBBzPhmDJsqCdmc8W4jLFT5/dtGBKRWOCtR3mKW3YAXDPRapFeiKGaPaRmkFBmELFNOfGTRICdGT2hpRWYwhlxFXllacwb2ZV3ZJ90YeHXCtCo/Tk4Tsad8MGI9UicgIKzOjEscZga+d5pBIYSV7G4pFyFG6BxOe3GQN9Qt4RXJQmSH7GC0vwh3dS4WSVgw/ge+v5XCUAPIwz9IBGPF8VyNRsq+M+kVHxQm7CWcIGSNa3+0H/avcav9+zv4124yNRP5WhTAKGoFyGsw3WzDbgj0pF84BRbBtMAzwVcBtDSFhijsVcf6g+YqhhBel1hoyKQSO7AYoCvKVRDO7J2LsOalI5DL9Fb1z8spjQbibe5Gfy+NFMNCbmM5b8wOrWjsez5YPUx3e4A5d3O2F3Ytvpzuf4qmCml4MJfS41kbdmkR5h2VmHFtIbhu/mPcDJgAw0ELkLZoUN52ArLhrII6jQK14+8eeBQ4IcPn6fI7ybnyE9ZDFTHm5xcZsY3LVA9rFJpKm6fiiS+hldjKv+NdRUn1Nr+iZUFzDx5z7pyZiuonteUYrJYbn8gt2fopbJ9hRot7C26FkppX+uamIxRBpX/+j8lqqmIWrET7xTK48ouRH/Djl8GtluMnro8Q07fVDQabeHdgWwOYx/RGn0MF/ATJes=
-  on:
-    tags: true
-  distributions: sdist bdist_wheel
+
+jobs:
+  include:
+    - stage: deploy to pypi
+      script: echo Deploy
+      python: '3.6'
+      deploy:
+        provider: pypi
+        user: __token__
+        password:
+          secure: T2gpaUe9eayCKlTWJnmBBzPhmDJsqCdmc8W4jLFT5/dtGBKRWOCtR3mKW3YAXDPRapFeiKGaPaRmkFBmELFNOfGTRICdGT2hpRWYwhlxFXllacwb2ZV3ZJ90YeHXCtCo/Tk4Tsad8MGI9UicgIKzOjEscZga+d5pBIYSV7G4pFyFG6BxOe3GQN9Qt4RXJQmSH7GC0vwh3dS4WSVgw/ge+v5XCUAPIwz9IBGPF8VyNRsq+M+kVHxQm7CWcIGSNa3+0H/avcav9+zv4124yNRP5WhTAKGoFyGsw3WzDbgj0pF84BRbBtMAzwVcBtDSFhijsVcf6g+YqhhBel1hoyKQSO7AYoCvKVRDO7J2LsOalI5DL9Fb1z8spjQbibe5Gfy+NFMNCbmM5b8wOrWjsez5YPUx3e4A5d3O2F3Ytvpzuf4qmCml4MJfS41kbdmkR5h2VmHFtIbhu/mPcDJgAw0ELkLZoUN52ArLhrII6jQK14+8eeBQ4IcPn6fI7ybnyE9ZDFTHm5xcZsY3LVA9rFJpKm6fiiS+hldjKv+NdRUn1Nr+iZUFzDx5z7pyZiuonteUYrJYbn8gt2fopbJ9hRot7C26FkppX+uamIxRBpX/+j8lqqmIWrET7xTK48ouRH/Djl8GtluMnro8Q07fVDQabeHdgWwOYx/RGn0MF/ATJes=
+        on:
+          tags: true
+        distributions: sdist bdist_wheel
